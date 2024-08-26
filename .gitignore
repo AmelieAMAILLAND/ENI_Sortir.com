@@ -25,5 +25,8 @@
 ###< symfony/asset-mapper ###
 
 
-### Le fichier macOS relou ###
+### Les fichiers macOS relou ###
+/assets/.DS_STORE
+/config/.DS_STORE
+/src/.DS_STORE
 .DS_STORE
