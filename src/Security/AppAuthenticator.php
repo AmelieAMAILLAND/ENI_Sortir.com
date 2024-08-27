@@ -52,7 +52,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         // For example:
-        return new RedirectResponse('/login');
+        return new RedirectResponse('/');
         //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 

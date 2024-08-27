@@ -12,12 +12,54 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
-    <body>
-        {% for label, messages in app.flashes %}
+    <body class="flex flex-col h-dvh">
+    <header>
+        <nav class="bg-blue-950 flex gap-3 justify-between">
+            <a href="{{ path('app_home') }}">
+                <img src="{{ asset('images/logosortirok.png')}}" alt="LOGO" class="w-20">
+            </a>
+            <ul class="px-3 flex gap-2 items-center">
+                {% if is_granted("ROLE_ADMIN")%}
+                    <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                        <a href="">Villes</a>
+                    </li>
+                    <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                        <a href="">Sites</a>
+                    </li>
+                {% endif %}
+
+                <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                    <a href="{{ path('app_event_index') }}">Sorties</a>
+                </li>
+
+                {% if is_granted('ROLE_USER') %}
+                    <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                        <a href="{{ path('app_monProfile') }}">Mon profil</a>
+                    </li>
+                {% endif %}
+
+                {% if app.user is null %}
+                    <li class="{{ app.current_route == 'app_login' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                        <a href="{{ path('app_login') }}">Se connecter</a>
+                    </li>
+                {% else %}
+                    <li class="text-white hover:opacity-80">
+                        <a href="{{ path('app_logout') }}">Se déconnecter</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+      {% for label, messages in app.flashes %}
             {% for message in messages %}
                 <div class="alert alert-{{ label }}">{{ message }}</div>
             {% endfor %}
         {% endfor %}
+    <main class="flex-grow">
         {% block body %}{% endblock %}
+    </main>
+    <footer class="h-10 bg-blue-950">
+        <p class="py-2 text-center text-white">© SORTIR 2024</p>
+    </footer>
     </body>
 </html>
