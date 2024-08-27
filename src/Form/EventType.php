@@ -38,6 +38,9 @@ class EventType extends AbstractType
             ])
             ->add('submit', SubmitType::class,[
                 'label'=>'Enregistrer'
+            ])
+            ->add('publish', SubmitType::class,[
+                'label'=>'Publier la sortie'
             ]);
     }
 

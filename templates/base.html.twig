@@ -28,13 +28,13 @@
                     </li>
                 {% endif %}
 
-                <li class="{{ app.current_route == 'app_home' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                    <a href="{{ path('app_home') }}">Accueil</a>
+                <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                    <a href="{{ path('app_event_index') }}">Sorties</a>
                 </li>
 
                 {% if is_granted('ROLE_USER') %}
-                    <li class="{{ app.current_route == 'profil' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                        <a href="">Mon profil</a>
+                    <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                        <a href="{{ path('app_monProfile') }}">Mon profil</a>
                     </li>
                 {% endif %}
 
@@ -50,7 +50,11 @@
             </ul>
         </nav>
     </header>
-
+      {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
     <main class="flex-grow">
         {% block body %}{% endblock %}
     </main>

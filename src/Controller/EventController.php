@@ -39,12 +39,18 @@ class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if($form->get('publish')->isClicked()){
+                $event->setState('published');
+            }else{
+                $event->setState('created');
+            }
+            $event->setPlanner($this->getUser());
             $entityManager->persist($event);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
         }
-        return $this->render('event/new.html.twig', [
+        return $this->render('event/edit.html.twig', [
             'event' => $event,
             'form' => $form,
         ]);
@@ -69,19 +75,32 @@ class EventController extends AbstractController
     #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EventType::class, $event);
-        $form->handleRequest($request);
+        $owner = $event->getPlanner();
+//        dd($owner);
+        if ($owner===$this->getUser()) {
+                $form = $this->createForm(EventType::class, $event);
+                $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+                if ($form->isSubmitted() && $form->isValid()) {
+                    if ($form->get('publish')->isClicked()) {
+                        $event->setState('published');
+                    } else {
+                        $event->setState('created');
+                    }
+                    $entityManager->flush();
 
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+                    return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+                }
+
+
+                return $this->render('event/edit.html.twig', [
+                    'event' => $event,
+                    'form' => $form,
+                ]);
+        } else{
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur' );
+            return $this->redirectToRoute('app_event_index');
         }
-
-        return $this->render('event/edit.html.twig', [
-            'event' => $event,
-            'form' => $form,
-        ]);
     }
 
     #[Route('/{id}', name: 'app_event_delete', methods: ['POST'])]
@@ -95,14 +114,4 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/publish', name: 'app_event_publish', methods: ['GET', 'POST'])]
-    public function publish(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // TODO vérifier si la sortie existe déjà ou pas
-        // si oui, la mettre à jour
-        // si non, la créer avec le statut 'publié'
-
-
-            return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
-    }
 }
