@@ -25,9 +25,12 @@ class EventController extends AbstractController
             $events = $eventRepository->findAll(); // Ou toute autre méthode de récupération des données
         }
 
+        $statusArray = ['published', 'created', 'in_progress', 'past', 'canceled'];
+        
         return $this->render('event/index.html.twig', [
             'events' => $events,
             'currentStatus' => $status,
+            'statusArray' => $statusArray,
         ]);
     }
 

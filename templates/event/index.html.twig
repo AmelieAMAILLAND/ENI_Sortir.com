@@ -45,8 +45,8 @@
         <form method="GET">
             <select name="status">
                 <option value="">Tous les statuts</option>
-                {% for status in ['created', 'opened', 'closed', 'in_progress', 'past', 'canceled'] %}
-                    <option value="{{ status }}" {{ 'currentStatus' == status ? 'selected' }}>{{ status }}</option>
+                {% for status in statusArray %}
+                    <option value="{{ status }}" {{ currentStatus == status ? 'selected' : ''}}>{{ status }}</option>
                 {% endfor %}
             </select>
             <button type="submit">Filtrer</button>
@@ -56,7 +56,7 @@
     <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
 
         {% for event in events %}
-            <div class="event-card container border border-slate-50 min-h-[270px] max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between bg-amber-50 rounded-md shadow-md">
+            <div class="event-card {{ event.state | mapStatusForTailwind}} max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md ">
                 <div class="name-and-date-container flex justify-between items-end">
                     <p class="font-semibold text-xl hover:opacity-80">
                         <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>
@@ -78,11 +78,11 @@
                 </div>
                 <div class="org-container flex justify-between">
                     <p>Organisateur : <a href="" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
-                    <p class="">{{ event.state }}</p>
+                    <p class="">{{ event.state | upper }}</p>
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md">VOIR</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md">MODIFIER</a>
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
+                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
                 </div>
             </div>
 
