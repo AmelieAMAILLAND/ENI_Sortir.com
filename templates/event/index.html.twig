@@ -5,54 +5,58 @@
 {% block body %}
     <h1 class="text-center text-3xl font-semibold my-3">Les sorties</h1>
 
-    <table class="table-fixed max-w-[1300px] mx-auto border border-slate-500 rounded-md shadow-md py-3">
-        <thead>
-            <tr>
-                <th class="py-1 px-2 text-xl text-center ">Nom</th>
-                <th class="text-xl text-center ">Durée</th>
-                <th class="text-xl text-center ">Début</th>
-                <th class="text-xl text-center ">Date limite</th>
-                <th class="text-xl text-center ">Places</th>
-                <th class="text-xl text-center ">Description</th>
-                <th class="text-xl text-center ">État</th>
-                <th class="text-xl text-center ">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+{#    <table class="table-fixed max-w-[1300px] mx-auto border border-slate-500 rounded-md shadow-md py-3">#}
+{#        <thead>#}
+{#            <tr>#}
+{#                <th class="py-1 px-2 text-xl text-center ">Nom</th>#}
+{#                <th class="text-xl text-center ">Durée</th>#}
+{#                <th class="text-xl text-center ">Début</th>#}
+{#                <th class="text-xl text-center ">Date limite</th>#}
+{#                <th class="text-xl text-center ">Places</th>#}
+{#                <th class="text-xl text-center ">Description</th>#}
+{#                <th class="text-xl text-center ">État</th>#}
+{#                <th class="text-xl text-center ">Actions</th>#}
+{#            </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#        {% for event in events %}#}
+{#            <tr>#}
+{#                <td>{{ event.name }}</td>#}
+{#                <td>{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
+{#                <td>{{ event.dateTimeStart ? event.dateTimeStart|date('Y-m-d H:i:s') : '' }}</td>#}
+{#                <td>{{ event.registrationDeadline ? event.registrationDeadline|date('Y-m-d H:i:s') : '' }}</td>#}
+{#                <td>{{ event.maxNbRegistration }}</td>#}
+{#                <td>{{ event.infoEvent }}</td>#}
+{#                <td>{{ event.state }}</td>#}
+{#                <td>#}
+{#                    <a href="{{ path('app_event_show', {'id': event.id}) }}">VOIR</a>#}
+{#                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">MODIFIER</a>#}
+{#                </td>#}
+{#            </tr>#}
+{#        {% else %}#}
+{#            <tr>#}
+{#                <td colspan="9">no records found</td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
+{#        </tbody>#}
+{#    </table>#}
+
+
+    <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
+
         {% for event in events %}
-            <tr>
-                <td>{{ event.name }}</td>
-                <td>{{ event.duration ? event.duration|date('H:i') : '' }}</td>
-                <td>{{ event.dateTimeStart ? event.dateTimeStart|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.registrationDeadline ? event.registrationDeadline|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.maxNbRegistration }}</td>
-                <td>{{ event.infoEvent }}</td>
-                <td>{{ event.state }}</td>
-                <td>
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}">VOIR</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">MODIFIER</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_event_new') }}">Create new</a>
-
-    <div class="container grid-cols-4">
-
-        {% for event in events %}
-            <div class="event-card container border border-red-500 h-fit flex flex-col">
-                <div class="name-and-date-container flex justify-between">
-                    <p>{{ event.name }}</p>
-                    <p>{{ event.dateTimeStart ? event.dateTimeStart|date('d-m-Y à H:i:s') : '' }}</p>
+            <div class="event-card container border border-slate-50 min-h-[270px] max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between bg-amber-50 rounded-md shadow-md">
+                <div class="name-and-date-container flex justify-between items-end">
+                    <p class="font-semibold text-xl hover:opacity-80">
+                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>
+                    </p>
+                    <p class="font-semibold">{{ event.dateTimeStart ? event.dateTimeStart|date('d-m-Y à H:i') : '' }}</p>
                 </div>
-                <div class="inscr-container flex justify-between">
-                    <p>{{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y H:i:s') : '' }}</p>
+                <div class="inscr-container flex justify-between items-center">
+                    <div class="limit-container ">
+                        <p class="font-semibold">Date limite : </p>
+                        <p> {{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y - H:i') : '' }}</p>
+                    </div>
                     <p>Inscrit OU Pas</p>
                 </div>
                 <div class="place-container">
@@ -61,13 +65,13 @@
                 <div class="desc-container">
                     <p>{{ event.infoEvent }}</p>
                 </div>
-                <div class="org-container">
-
-                    <p>Organisateur : <a href="" >{{ event.planner.pseudo }}</a></p>
+                <div class="org-container flex justify-between">
+                    <p>Organisateur : <a href="" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
+                    <p class="">{{ event.state }}</p>
                 </div>
-                <div class="actions-container">
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}">VOIR</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">MODIFIER</a>
+                <div class="actions-container mx-auto max-w-fit mt-2">
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md">VOIR</a>
+                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md">MODIFIER</a>
                 </div>
             </div>
         {% else %}
@@ -77,4 +81,7 @@
         {% endfor %}
 
     </div>
+
+    <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
+
 {% endblock %}
