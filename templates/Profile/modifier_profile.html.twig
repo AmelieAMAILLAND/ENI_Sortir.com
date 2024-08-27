@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Mon profil</h1>
+
+    {{ form_start(form, { 'attr': {'enctype': 'multipart/form-data'} }) }}
+
+    <div class="profile-container">
+        <div class="profile-image">
+            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}" data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}" alt="Prévisualisation de l'image" style="width: 300px; height: 300px;">
+            <button type="button" id="remove-picture" class="btn btn-danger mt-2" onclick="removePicture()">Supprimer la photo</button>
+        </div>
+
+        <div class="profile-form">
+            {{ form_errors(form) }}
+            {{ form_row(form.pseudo) }}
+            {{ form_row(form.first_name) }}
+            {{ form_row(form.last_name) }}
+            {{ form_row(form.phone) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.password) }}
+            {{ form_row(form.password_confirmation) }}
+            {{ form_row(form.site) }}
+            {{ form_row(form.profilePicture, {'attr': {'onchange': 'previewImage(event)'}}) }}
+            {{ form_rest(form) }}
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('JavaScript/profile.js') }}"></script>
+{% endblock %}
+
+
+
+
