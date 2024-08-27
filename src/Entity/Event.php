@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Event
 {
     #[ORM\Id]
@@ -117,10 +118,10 @@ class Event
         return $this->state;
     }
 
-    public function setState(string $state): static
+    #[ORM\PrePersist]
+    public function setState(): static
     {
-        $this->state = $state;
-
+        $this->state = 'created';
         return $this;
     }
 }
