@@ -15,10 +15,19 @@ use Symfony\Component\Routing\Attribute\Route;
 class EventController extends AbstractController
 {
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository): Response
+    public function index(EventRepository $eventRepository, Request $request): Response
     {
+        $status = $request->query->get('status', null);
+
+        if ($status) {
+            $events = $eventRepository->findByStatus($status);
+        } else {
+            $events = $eventRepository->findAll(); // Ou toute autre méthode de récupération des données
+        }
+
         return $this->render('event/index.html.twig', [
-            'events' => $eventRepository->findAll(),
+            'events' => $events,
+            'currentStatus' => $status,
         ]);
     }
 
@@ -48,12 +57,20 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_event_show', methods: ['GET'])]
-    public function show(Event $event): Response
+    public function show(EventRepository $eventRepository, int $id): Response
     {
+        $event = $eventRepository->findOneById($id);
+
+        if (!$event || $event->getState() !== 'published') {
+            return $this->redirectToRoute('app_event_index');
+        }
+
         return $this->render('event/show.html.twig', [
             'event' => $event,
         ]);
     }
+
+
 
     #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response

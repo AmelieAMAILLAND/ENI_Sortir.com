@@ -41,7 +41,18 @@
 {#        </tbody>#}
 {#    </table>#}
 
-
+    <div class="filter">
+        <form method="GET">
+            <select name="status">
+                <option value="">Tous les statuts</option>
+                {% for status in ['created', 'opened', 'closed', 'in_progress', 'past', 'canceled'] %}
+                    <option value="{{ status }}" {{ 'currentStatus' == status ? 'selected' }}>{{ status }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filtrer</button>
+        </form>
+    </div>
+    
     <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
 
         {% for event in events %}
@@ -74,11 +85,13 @@
                     <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md">MODIFIER</a>
                 </div>
             </div>
+
         {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
+            <div>
+                <p>No events found.</p>
+            </div>
         {% endfor %}
+
 
     </div>
 
