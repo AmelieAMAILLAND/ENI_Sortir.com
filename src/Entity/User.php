@@ -32,8 +32,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $username = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $pseudo = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $first_name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $last_name = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $phone = null;
+
+  
+    // Getters et Setters 
 
     public function getId(): ?int
     {
@@ -48,6 +61,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPseudo(): ?string
+    {
+        return $this->pseudo;
+    }
+
+    public function setPseudo(?string $pseudo): static
+    {
+        $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+
+    public function setFirstName(?string $first_name): static
+    {
+        $this->first_name = $first_name;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+    }
+
+    public function setLastName(?string $lastName): static
+    {
+        $this->last_name = $lastName;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
 
         return $this;
     }
