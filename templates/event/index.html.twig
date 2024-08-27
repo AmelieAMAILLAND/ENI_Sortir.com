@@ -5,43 +5,55 @@
 {% block body %}
     <h1>Event index</h1>
 
+    <div class="filter">
+        <form method="GET">
+            <select name="status">
+                <option value="">Tous les statuts</option>
+                {% for status in ['created', 'opened', 'closed', 'in_progress', 'past', 'canceled'] %}
+                    <option value="{{ status }}" {{ 'currentStatus' == status ? 'selected' }}>{{ status }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filtrer</button>
+        </form>
+    </div>
+
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>DateTimeStart</th>
-                <th>Duration</th>
-                <th>RegistrationDeadline</th>
-                <th>MaxNbRegistration</th>
-                <th>InfoEvent</th>
-                <th>State</th>
-                <th>actions</th>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Date Start</th>
+            <th>Duration</th>
+            <th>Registration Deadline</th>
+            <th>Max Registration</th>
+            <th>Info Event</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
         {% for event in events %}
             <tr>
                 <td>{{ event.id }}</td>
                 <td>{{ event.name }}</td>
-                <td>{{ event.dateTimeStart ? event.dateTimeStart|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.duration ? event.duration|date('H:i:s') : '' }}</td>
-                <td>{{ event.registrationDeadline ? event.registrationDeadline|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ event.dateTimeStart|date('Y-m-d H:i:s') }}</td>
+                <td>{{ event.duration|date('H:i:s') }}</td>
+                <td>{{ event.registrationDeadline|date('Y-m-d H:i:s') }}</td>
                 <td>{{ event.maxNbRegistration }}</td>
                 <td>{{ event.infoEvent }}</td>
                 <td>{{ event.state }}</td>
                 <td>
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}">show</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">edit</a>
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}">Show</a>
+                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">Edit</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="9">no records found</td>
+                <td colspan="9">No events found.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_event_new') }}">Create new</a>
+    <a href="{{ path('app_event_new') }}">Create new event</a>
 {% endblock %}

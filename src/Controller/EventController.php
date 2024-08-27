@@ -15,10 +15,19 @@ use Symfony\Component\Routing\Attribute\Route;
 class EventController extends AbstractController
 {
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository): Response
+    public function index(EventRepository $eventRepository, Request $request): Response
     {
+        $status = $request->query->get('status', null);
+
+        if ($status) {
+            $events = $eventRepository->findByStatus($status);
+        } else {
+            $events = $eventRepository->findAll(); // Ou toute autre méthode de récupération des données
+        }
+
         return $this->render('event/index.html.twig', [
-            'events' => $eventRepository->findAll(),
+            'events' => $events,
+            'currentStatus' => $status,
         ]);
     }
 
