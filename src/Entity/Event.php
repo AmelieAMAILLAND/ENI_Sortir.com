@@ -118,10 +118,11 @@ class Event
         return $this->state;
     }
 
-    #[ORM\PrePersist]
-    public function setState(): static
+    public function setState(string $state): static
     {
-        $this->state = 'created';
+
+        $this->state = $state;
+
         return $this;
     }
 }
