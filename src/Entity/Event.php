@@ -36,6 +36,10 @@ class Event
     #[ORM\Column(length: 30)]
     private ?string $state = null;
 
+    #[ORM\ManyToOne(inversedBy: 'plannedEvents')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $planner = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +126,18 @@ class Event
     {
 
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getPlanner(): ?User
+    {
+        return $this->planner;
+    }
+
+    public function setPlanner(?User $planner): static
+    {
+        $this->planner = $planner;
 
         return $this;
     }
