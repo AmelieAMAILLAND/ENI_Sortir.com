@@ -35,7 +35,10 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/mon_profile/modifier', name: 'app_modifierProfile')]
-    public function edit(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, UserPasswordHasherInterface $passwordHasher): Response
+    public function edit(Request $request,
+                         EntityManagerInterface $entityManager,
+                         SluggerInterface $slugger,
+                         UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $this->getUser();
 
