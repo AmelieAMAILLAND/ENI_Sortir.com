@@ -47,6 +47,12 @@
         </table>
     </div>
 
-    <a href="{{ path('app_event_register',{ 'id':event.id}) }}">S'inscrire</a>
+    {% if event.state == 'published' %}
+        {% if app.user not in event.registered %}
+            <a href="{{ path('app_event_register',{ 'id':event.id}) }}">S'inscrire</a>
+        {% else %}
+            <a href="{{ path('app_event_unregister',{ 'id':event.id}) }}">Se désister</a>
+        {% endif %}
+    {% endif %}
 
 {% endblock %}

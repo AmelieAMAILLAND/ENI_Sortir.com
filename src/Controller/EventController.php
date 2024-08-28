@@ -150,4 +150,18 @@ class EventController extends AbstractController
         $entityManager->flush();
         return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
     }
+
+    #[Route('/{id}/unregister', name: '_unregister')]
+    public function unregister(Event $event, EntityManagerInterface $entityManager): Response
+    {
+        $now = new \DateTime();
+        if ($event->getRegistrationDeadline() < $now){
+            $this->addFlash('danger', 'DÉSISTEMENT IMPOSSIBLE : date limite d\'inscription dépassée' );
+            return $this->redirectToRoute('app_event_index');
+        }
+
+        $event->removeRegistered($this->getUser());
+        $entityManager->flush();
+        return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
+    }
 }
