@@ -7,7 +7,8 @@
 
     <div class="profile-container">
         <div class="profile-image">
-            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}" data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}" alt="Prévisualisation de l'image" style="width: 300px; height: 300px;">
+            <!-- Image de prévisualisation avec une source par défaut -->
+            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}" data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}" alt="Prévisualisation de l'image" style="width: 150px; height: 150px;">
             <button type="button" id="remove-picture" class="btn btn-danger mt-2" onclick="removePicture()">Supprimer la photo</button>
         </div>
 
