@@ -76,8 +76,7 @@ class EventController extends AbstractController
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $owner = $event->getPlanner();
-//        dd($owner);
-        if ($owner===$this->getUser()) {
+        if ($owner===$this->getUser() && ($event->getState()==='created' || $event->getState()==='published')) {
                 $form = $this->createForm(EventType::class, $event);
                 $form->handleRequest($request);
 
@@ -97,16 +96,21 @@ class EventController extends AbstractController
                     'event' => $event,
                     'form' => $form,
                 ]);
-        } else{
+        }
+        elseif ($owner!==$this->getUser()){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur' );
             return $this->redirectToRoute('app_event_index');
+        } else {
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il est déjà passé ou annulé' );
+            return $this->redirectToRoute('app_event_index');
         }
+
     }
 
     #[Route('/{id}', name: 'app_event_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('delete_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
         }
@@ -114,4 +118,15 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{id}/cancel', name: 'app_event_cancel', methods: ['POST'])]
+    public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('cancel'.$event->getId(), $request->getPayload()->getString('cancel_token'))) {
+            $event->setState('canceled');
+            $entityManager->persist($event);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
