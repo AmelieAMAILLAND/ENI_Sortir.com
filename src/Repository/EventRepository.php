@@ -84,10 +84,15 @@ class EventRepository extends ServiceEntityRepository
                         ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
                 }
                 if($filtersDTO->registered === 'notRegistered'){
+                    //FONCTIONNE PAS VOIR PLUS TARD
+//                    $expr = $query->expr();
+//
+//                    $cond1 = $expr->neq('reg_user.pseudo', $filtersDTO->userPseudo);
+//                    $cond2 = $expr->isNull('reg_user.pseudo');
 
-                    $expr = $query->expr();
-                    $query->andWhere($expr->neq('reg_user.pseudo', ':regUserPseudo'))
-                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
+                   //$query->andWhere('reg_user.pseudo != :regUserPseudo OR reg_user.pseudo IS NULL') FONCTIONNE PRESQUE (si inscrit et plusieurs users fonctionne pas)
+
+                    $query->andWhere('reg_user.pseudo IS NULL');
                 }
             }
 
