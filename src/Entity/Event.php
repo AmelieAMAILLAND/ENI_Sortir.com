@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,6 +41,17 @@ class Event
     #[ORM\ManyToOne(inversedBy: 'plannedEvents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $planner = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'registeredFor')]
+    private Collection $registered;
+
+    public function __construct()
+    {
+        $this->registered = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -138,6 +151,30 @@ class Event
     public function setPlanner(?User $planner): static
     {
         $this->planner = $planner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getRegistered(): Collection
+    {
+        return $this->registered;
+    }
+
+    public function addRegistered(User $registered): static
+    {
+        if (!$this->registered->contains($registered)) {
+            $this->registered->add($registered);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistered(User $registered): static
+    {
+        $this->registered->removeElement($registered);
 
         return $this;
     }

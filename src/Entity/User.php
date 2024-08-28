@@ -47,7 +47,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
-  
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
     /**
      * @var Collection<int, Event>
      */
@@ -58,12 +61,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Site $site = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $profilePicture = null;
+    /**
+     * @var Collection<int, Event>
+     */
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'registered')]
+    private Collection $registeredFor;
 
     public function __construct()
     {
         $this->plannedEvents = new ArrayCollection();
+        $this->registeredFor = new ArrayCollection();
     }
   
     // Getters et Setters 
@@ -249,6 +256,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($plannedEvent->getPlanner() === $this) {
                 $plannedEvent->setPlanner(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getRegisteredFor(): Collection
+    {
+        return $this->registeredFor;
+    }
+
+    public function addRegisteredFor(Event $registeredFor): static
+    {
+        if (!$this->registeredFor->contains($registeredFor)) {
+            $this->registeredFor->add($registeredFor);
+            $registeredFor->addRegistered($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegisteredFor(Event $registeredFor): static
+    {
+        if ($this->registeredFor->removeElement($registeredFor)) {
+            $registeredFor->removeRegistered($this);
         }
 
         return $this;
