@@ -25,6 +25,17 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByIdWithRegistered(int $id): Event
+    {
+        return $this->createQueryBuilder('e')
+            ->addSelect('user')
+            ->leftJoin('e.registered', 'user')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Event[] Returns an array of Event objects
     //     */

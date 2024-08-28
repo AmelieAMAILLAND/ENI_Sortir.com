@@ -62,7 +62,8 @@ class EventController extends AbstractController
     #[Route('/{id}', name: '_show', methods: ['GET'])]
     public function show(EventRepository $eventRepository, int $id): Response
     {
-        $event = $eventRepository->findOneById($id);
+        $event=$eventRepository->findByIdWithRegistered($id);
+//        $event = $eventRepository->findOneById($id);
 
         if (!$event || $event->getState() !== 'published') {
             return $this->redirectToRoute('app_event_index');
