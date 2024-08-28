@@ -2,35 +2,42 @@
 
 namespace App\Controller;
 
+use App\DTO\filtersDTO;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\SiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {
     #[Route('/', name: '_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository, Request $request): Response
+    public function index(EventRepository $eventRepository,
+                          SiteRepository $siteRepository,
+                          Request $request,
+                          #[MapQueryString] filtersDTO $filtersDTO
+    ): Response
     {
-        $status = $request->query->get('status', null);
+        //dd($filtersDTO);
 
-        if ($status) {
-            $events = $eventRepository->findByStatus($status);
-        } else {
-            $events = $eventRepository->findAll(); // Ou toute autre méthode de récupération des données
-        }
+        $events = [];
+        $events = $eventRepository->findWithMultipleFilters($filtersDTO);
 
-        $statusArray = ['published', 'created', 'in_progress', 'past', 'canceled'];
+        $statusArray = ['published' , 'in_progress', 'past', 'canceled'];
+
+        $sites = $siteRepository->findAll();
         
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'currentStatus' => $status,
             'statusArray' => $statusArray,
+            'sites'=>$sites,
+            'filters'=>$filtersDTO
         ]);
     }
 

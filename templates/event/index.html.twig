@@ -41,15 +41,58 @@
 {#        </tbody>#}
 {#    </table>#}
 
-    <div class="filter">
+    <div class="filters-container">
         <form method="GET">
-            <select name="status">
-                <option value="">Tous les statuts</option>
-                {% for status in statusArray %}
-                    <option value="{{ status }}" {{ currentStatus == status ? 'selected' : ''}}>{{ status }}</option>
-                {% endfor %}
-            </select>
+            <div class="status-container">
+                <label for="status">Statut</label>
+                <select name="status" id="status">
+                    <option value="">Tous les statuts</option>
+                    {% for status in statusArray %}
+                        <option value="{{ status }}" {{ filters.status == status ? 'selected' : ''}}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="site-container">
+                <label for="siteName">Site</label>
+                <select name="siteName" id="siteName">
+                    <option value="">Tous les sites</option>
+                    {% for site in sites %}
+                        <option value="{{ site.name }}" {{ filters.siteName == site.name ? 'selected' : ''}}>{{ site }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="name-container">
+                <label for="nameInput">Nom contenant </label>
+                <input type="text" name="nameInput" id="nameInput" placeholder="..." value="{{ filters.nameInput }}">
+            </div>
+            <div class="dates-container">
+                <label for="beginDate">Entre </label>
+                <input type="datetime-local" name="beginDate" id="beginDate" value="{{ filters.beginDate }}">
+                <label for="endDate"> et </label>
+                <input type="datetime-local" name="endDate" id="endDate" value="{{ filters.endDate }}">
+            </div>
+            <div class="checkboxes-container">
+                <div class="placesLeft">
+                    <label for="placeLeft">Places restantes</label>
+                    <input type="checkbox" id="placeLeft" name="placeLeft">
+                </div>
+                <div class="planner-container">
+                    <label for="isPlanner">Dont je suis organisateur</label>
+                    <input type="checkbox" id="isPlanner" name="isPlanner" {{ filters.isPlanner ? 'checked' : '' }}>
+                </div>
+                <div class="registered-container">
+                    <label for="registeredAll">Peu importe</label>
+                    <input type="radio" name="registered" value="all" id="registeredAll" {{ filters.registered == "all" ? 'checked' : '' }}>
+                    <label for="registeredOk">Inscrit</label>
+                    <input type="radio" name="registered" value="registeredOk" id="registeredOk" {{ filters.registered == "registeredOk" ? 'checked' : '' }}>
+                    <label for="notRegistered">Non inscrit</label>
+                    <input type="radio" name="registered" value="notRegistered" id="notRegistered" {{ filters.registered == "notRegistered" ? 'checked' : '' }}>
+                </div>
+                <input type="hidden" value="{{ app.user.pseudo }}" name="userPseudo">
+            </div>
             <button type="submit">Filtrer</button>
+            <button type="reset">Réinitialiser</button>
+
         </form>
     </div>
     
@@ -68,7 +111,13 @@
                         <p class="font-semibold">Date limite : </p>
                         <p> {{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y - H:i') : '' }}</p>
                     </div>
-                    <p>Inscrit OU Pas</p>
+
+                    {% if app.user in event.registered %}
+                        <img src="{{ asset('images/registered.svg') }}" alt="icone correcte" class="w-10">
+                    {% else %}
+                        <img src="{{ asset('images/notRegistered.svg') }}" alt="icone fausse" class="w-10">
+                    {% endif %}
+
                 </div>
                 <div class="place-container">
                     <p>{{ event.maxNbRegistration }} places</p>
@@ -84,13 +133,15 @@
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
                     <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
+                    {% if event.planner.pseudo == app.user.pseudo %}
+                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
+                    {% endif %}
                 </div>
             </div>
 
         {% else %}
             <div>
-                <p>No events found.</p>
+                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>
             </div>
         {% endfor %}
 
