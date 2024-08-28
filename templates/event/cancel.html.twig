@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Annuler une sortie{% endblock %}
+
+{% block body %}
+    <h1>Annuler la sortie</h1>
+
+    {{ form_start(form) }}
+    <div>
+        <label>Nom de la sortie :</label>
+        <span>{{ event.name }}</span>
+    </div>
+    <div>
+        <label>Date de la sortie :</label>
+        <span>{{ event.dateTimeStart|date('d/m/Y') }}</span>
+    </div>
+    {#  <div>
+        <label>Site organisateur :</label>
+        <span>{{ site.siteOrganisateur }}</span>
+    </div>
+    <div>
+        <label>Lieu :</label>
+        <span>{{ event.lieu }}</span>
+    </div>#}
+    <div>
+        {{ form_row(form.annulation) }}
+    </div>
+    <div>
+        <button type="submit">Enregistrer l'annulation</button>
+        <a href="{{ path('app_event_edit', {'id': event.id}) }}">
+            <button type="button">Retour</button>
+        </a>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Form\AnnulationType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -122,17 +123,33 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'])]
+    // src/Controller/EventController.php
+
+    #[Route('/{id}/cancel', name: '_cancel', methods: ['GET', 'POST'])]
     public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('cancel'.$event->getId(), $request->getPayload()->getString('cancel_token'))) {
-            $event->setState('canceled');
-            $entityManager->persist($event);
-            $entityManager->flush();
+        // Vérifier si l'utilisateur a les droits nécessaires
+        if ($event->getPlanner() !== $this->getUser()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas annuler cet évènement car vous n\'en êtes pas l\'organisateur.');
+            return $this->redirectToRoute('app_event_index');
         }
 
-        return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+        $form = $this->createForm(AnnulationType::class, $event);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $event->setState('canceled');
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_event_index');
+        }
+
+        return $this->render('event/cancel.html.twig', [
+            'event' => $event,
+            'form' => $form->createView(),
+        ]);
     }
+
 
     #[Route('/{id}/register', name: '_register')]
     public function register(Event $event, EntityManagerInterface $entityManager): Response
