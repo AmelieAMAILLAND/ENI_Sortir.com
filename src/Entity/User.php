@@ -47,7 +47,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
-  
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePicture = null;
+
     /**
      * @var Collection<int, Event>
      */
@@ -149,6 +152,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
+
+        return $this;
+    }
+
+    public function getProfilePictureOrDefault(): string
+    {
+        if ($this->profilePicture) {
+            return 'uploads/' . $this->profilePicture;
+        }
+
+        return 'images/profile/ajouter_des_photos.png';
+    }
+
     /**
      * A visual identifier that represents this user.
      *
@@ -205,18 +229,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): static
-    {
-        $this->username = $username;
-
-        return $this;
     }
 
     /**

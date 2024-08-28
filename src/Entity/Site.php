@@ -43,4 +43,9 @@ class Site
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return $this->name;  // Ou une autre propriété qui représente l'entité
+    }
+
 }
