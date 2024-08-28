@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,6 +47,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
+  
+    /**
+     * @var Collection<int, Event>
+     */
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'planner', orphanRemoval: true)]
+    private Collection $plannedEvents;
 
     #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
@@ -52,6 +60,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
+
+    public function __construct()
+    {
+        $this->plannedEvents = new ArrayCollection();
+    }
   
     // Getters et Setters 
 
@@ -211,4 +224,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getPlannedEvents(): Collection
+    {
+        return $this->plannedEvents;
+    }
+
+    public function addPlannedEvent(Event $plannedEvent): static
+    {
+        if (!$this->plannedEvents->contains($plannedEvent)) {
+            $this->plannedEvents->add($plannedEvent);
+            $plannedEvent->setPlanner($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlannedEvent(Event $plannedEvent): static
+    {
+        if ($this->plannedEvents->removeElement($plannedEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($plannedEvent->getPlanner() === $this) {
+                $plannedEvent->setPlanner(null);
+            }
+        }
+
+        return $this;
+    }
 }

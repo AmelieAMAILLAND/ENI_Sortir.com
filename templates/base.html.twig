@@ -14,7 +14,7 @@
     </head>
     <body class="flex flex-col h-dvh">
     <header>
-        <nav class="bg-blue-950 flex gap-3 justify-between">
+        <nav class="bg-blue-950 flex gap-3 justify-between fixed w-full">
             <a href="{{ path('app_home') }}">
                 <img src="{{ asset('images/logosortirok.png')}}" alt="LOGO" class="w-20">
             </a>
@@ -50,8 +50,12 @@
             </ul>
         </nav>
     </header>
-
-    <main class="flex-grow">
+      {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+    <main class="flex-grow mt-[80px]">
         {% block body %}{% endblock %}
     </main>
     <footer class="h-10 bg-blue-950">
