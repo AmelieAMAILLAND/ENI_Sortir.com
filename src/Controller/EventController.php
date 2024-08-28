@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,7 +66,13 @@ class EventController extends AbstractController
         $event=$eventRepository->findByIdWithRegistered($id);
 //        $event = $eventRepository->findOneById($id);
 
-        if (!$event || $event->getState() !== 'published') {
+        if (!$event || $event->getState() === 'created') {
+            $this->addFlash('danger', 'Cette sortie n\'est pas visible' );
+            return $this->redirectToRoute('app_event_index');
+        }
+        $now = new \DateTime();
+        if ($now > $event->getDateTimeStart()->add(new DateInterval('P1M'))){
+            $this->addFlash('danger', 'Cette sortie est archivée' );
             return $this->redirectToRoute('app_event_index');
         }
 
