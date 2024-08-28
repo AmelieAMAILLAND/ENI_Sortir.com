@@ -3,10 +3,34 @@
 {% block title %}Edit Event{% endblock %}
 
 {% block body %}
-    <h1>{% if app.current_route=='app_event_new' %}Créer{% else %}Modifier{% endif %} une sortie </h1>
+    <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex flex-col">
+        <h1 class="mb-3 font-semibold text-center">{% if app.current_route=='app_event_new' %}Créer{% else %}Modifier{% endif %} une sortie </h1>
 
-    {{ include('event/_form.html.twig') }}
-    <a href="{{ path('app_event_index') }}">Annuler</a>
+        {{ form_start(form) }}
+            <div>
+                {{ form_errors(form) }}
+            </div>
+            <div>
+                {{ form_row(form.name) }}
+                {{ form_row(form.dateTimeStart) }}
+                {{ form_row(form.duration) }}
+                {{ form_row(form.registrationDeadline) }}
+                {{ form_row(form.maxNbRegistration) }}
+                {{ form_row(form.infoEvent) }}
+            </div>
+            <div>
+                {% if event.state=='created' %}
+                    {{ form_row(form.submit) }}
+                    {{ form_row(form.publish) }}
+                {% endif %}
+                {{ form_rest(form) }} {# pour passer le token #}
 
-{#    {{ include('event/_delete_form.html.twig') }}#}
+
+                <a href="{{ path('app_event_index') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" >Annuler</a>
+            </div>
+        {{ form_end(form) }}
+        {% if app.current_route=='app_event_edit' and event.state=='created'%} {{ include('event/_delete_form.html.twig') }} {% endif %}
+        {% if app.current_route=='app_event_edit' and event.state=='published'%} {{ include('event/_cancel_form.html.twig') }} {% endif %}
+
+    </div>
 {% endblock %}
