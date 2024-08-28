@@ -77,8 +77,10 @@
                     <p>{{ event.infoEvent }}</p>
                 </div>
                 <div class="org-container flex justify-between">
-                    <p>Organisateur : <a href="" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
+
+                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
                     <p class="">{{ event.state | upper }}</p>
+
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
                     <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
