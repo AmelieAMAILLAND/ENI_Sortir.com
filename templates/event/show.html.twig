@@ -3,50 +3,50 @@
 {% block title %}Event{% endblock %}
 
 {% block body %}
-    <h1>Event</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ event.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ event.name }}</td>
-            </tr>
-            <tr>
-                <th>DateTimeStart</th>
-                <td>{{ event.dateTimeStart ? event.dateTimeStart|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Duration</th>
-                <td>{{ event.duration ? event.duration|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>RegistrationDeadline</th>
-                <td>{{ event.registrationDeadline ? event.registrationDeadline|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MaxNbRegistration</th>
-                <td>{{ event.maxNbRegistration }}</td>
-            </tr>
-            <tr>
-                <th>InfoEvent</th>
-                <td>{{ event.infoEvent }}</td>
-            </tr>
-            <tr>
-                <th>State</th>
-                <td>{{ event.state }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div>
+        <time>{{ event.dateTimeStart |date('d/m/Y')}}</time>
+        <h1>{{ event.name }}</h1>
+    </div>
 
-    <a href="{{ path('app_event_index') }}">back to list</a>
+    <div>
+        <p>Organisé par {{ event.planner.pseudo }}</p>
+    </div>
+    <div>
+        <h2>Date et heure</h2>
+        <p>{{ event.dateTimeStart|date('d/m/Y H:i:s') }}</p>
+    </div>
+    <div>
+        <h2>Lieu</h2>
+        <p></p>
+    </div>
+    <div>
+        <h2>À propos de cet évènement</h2>
+        <p>Cet évènement dure {{ event.duration|date('G \\h\\e\\u\\r\\e\\s i \\m\\i\\n\\u\\t\\e\\s') }}</p>
+        <p>Il reste {{ event.maxNbRegistration - event.registered|length }} places sur {{ event.maxNbRegistration }}</p>
+        <p>Inscription avant le {{ event.registrationDeadline|date('d/m/Y à H:i') }}</p>
+        <p>{{ event.infoEvent }}</p>
+    </div>
+    <div>
+        <table>
+            <caption>Participants</caption>
+            <thead>
+            <tr>
+                <th>Pseudo</th>
+                <th>Nom</th>
+            </tr>   
+            </thead>
+            <tbody>
+                {% for participant in event.registered %}
+                    <tr>
+                        <td>{{ participant.pseudo }}</td>
+                        <td>{{ participant.firstName }} {{ participant.lastName|upper }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{{ path('app_event_edit', {'id': event.id}) }}">edit</a>
-
-    {{ include('event/_delete_form.html.twig') }}
-
+    <a href="{{ path('app_event_register',{ 'id':event.id}) }}">S'inscrire</a>
 
 {% endblock %}

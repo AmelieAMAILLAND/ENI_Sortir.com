@@ -11,10 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/event')]
+#[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {
-    #[Route('/', name: 'app_event_index', methods: ['GET'])]
+    #[Route('/', name: '_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository, Request $request): Response
     {
         $status = $request->query->get('status', null);
@@ -34,7 +34,7 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
@@ -59,7 +59,7 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_event_show', methods: ['GET'])]
+    #[Route('/{id}', name: '_show', methods: ['GET'])]
     public function show(EventRepository $eventRepository, int $id): Response
     {
         $event = $eventRepository->findOneById($id);
@@ -75,7 +75,7 @@ class EventController extends AbstractController
 
 
 
-    #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         $owner = $event->getPlanner();
@@ -110,7 +110,7 @@ class EventController extends AbstractController
 
     }
 
-    #[Route('/{id}', name: 'app_event_delete', methods: ['POST'])]
+    #[Route('/{id}', name: '_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('delete_token'))) {
@@ -121,7 +121,7 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/cancel', name: 'app_event_cancel', methods: ['POST'])]
+    #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'])]
     public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('cancel'.$event->getId(), $request->getPayload()->getString('cancel_token'))) {
@@ -131,5 +131,22 @@ class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/register', name: '_register')]
+    public function register(Event $event, EntityManagerInterface $entityManager): Response
+    {
+        $now = new \DateTime();
+        if ($event->getRegistrationDeadline() < $now){
+            $this->addFlash('danger', 'INSCRIPTION IMPOSSIBLE : date limite d\'inscription dépassée' );
+            return $this->redirectToRoute('app_event_index');
+        }
+        if (count($event->getRegistered())>= $event->getMaxNbRegistration()){
+            $this->addFlash('danger', 'INSCRIPTION IMPOSSIBLE : nombre maximum de participant atteint' );
+            return $this->redirectToRoute('app_event_index');
+        }
+        $event->addRegistered($this->getUser());
+        $entityManager->flush();
+        return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
     }
 }
