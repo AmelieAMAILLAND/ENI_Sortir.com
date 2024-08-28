@@ -84,20 +84,24 @@ class EventRepository extends ServiceEntityRepository
                         ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
                 }
                 if($filtersDTO->registered === 'notRegistered'){
-                    //FONCTIONNE PAS VOIR PLUS TARD
-//                    $expr = $query->expr();
-//
-//                    $cond1 = $expr->neq('reg_user.pseudo', $filtersDTO->userPseudo);
-//                    $cond2 = $expr->isNull('reg_user.pseudo');
+                    
+                    //TEST CHATGPT (QUEL BOSS)
+                    $subQuery = $this->createQueryBuilder('sub')
+                        ->select('1')
+                        ->from('App\Entity\Event', 'ev')
+                        ->leftJoin('ev.registered', 'registered_user')
+                        ->where('ev.id = e.id')
+                        ->andWhere('registered_user.pseudo = :regUserPseudo')
+                        ->getDQL();
 
-                   //$query->andWhere('reg_user.pseudo != :regUserPseudo OR reg_user.pseudo IS NULL') FONCTIONNE PRESQUE (si inscrit et plusieurs users fonctionne pas)
-
-                    $query->andWhere('reg_user.pseudo IS NULL');
+                    $query->andWhere(
+                        $query->expr()->not(
+                            $query->expr()->exists($subQuery)
+                        )
+                    )
+                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
                 }
             }
-
-
-            //$query->groupBy('e.id');
 
             return $query->getQuery()->getResult();
 
