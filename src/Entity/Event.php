@@ -178,4 +178,9 @@ class Event
 
         return $this;
     }
+
+    public function getDurationInSeconds(): int
+    {
+        return $this->duration->format('H')*3600+$this->duration->format('i')*60;
+    }
 }

@@ -19,7 +19,7 @@ class ProfileController extends AbstractController
     #[Route('/mon_profile', name: 'app_monProfile')]
     public function monProfile(UserInterface $user): Response
     {
-        return $this->render('Profile/profile.html.twig', [
+        return $this->render('profile/profile.html.twig', [
             'user' => $user,
         ]);
     }
@@ -29,7 +29,7 @@ class ProfileController extends AbstractController
     {
         $user = $userRepository->find($id);
 
-        return $this->render('Profile/profile.html.twig', [
+        return $this->render('profile/profile.html.twig', [
             'user' => $user,
         ]);
     }

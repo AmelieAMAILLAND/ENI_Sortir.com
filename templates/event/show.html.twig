@@ -3,56 +3,59 @@
 {% block title %}Event{% endblock %}
 
 {% block body %}
+    <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex flex-col">
+        <div>
+            <time class="text-xs">{{ event.dateTimeStart |date('d/m/Y')}}</time>
+            <h1 class="mb-3 font-semibold text-center text-3xl">{{ event.name }}</h1>
+        </div>
 
-    <div>
-        <time>{{ event.dateTimeStart |date('d/m/Y')}}</time>
-        <h1>{{ event.name }}</h1>
-    </div>
-
-    <div>
-        <p>Organisé par {{ event.planner.pseudo }}</p>
-    </div>
-    <div>
-        <h2>Date et heure</h2>
-        <p>{{ event.dateTimeStart|date('d/m/Y H:i:s') }}</p>
-    </div>
-    <div>
-        <h2>Lieu</h2>
-        <p></p>
-    </div>
-    <div>
-        <h2>À propos de cet évènement</h2>
-        <p>Cet évènement dure {{ event.duration|date('G \\h\\e\\u\\r\\e\\s i \\m\\i\\n\\u\\t\\e\\s') }}</p>
-        <p>Il reste {{ event.maxNbRegistration - event.registered|length }} places sur {{ event.maxNbRegistration }}</p>
-        <p>Inscription avant le {{ event.registrationDeadline|date('d/m/Y à H:i') }}</p>
-        <p>{{ event.infoEvent }}</p>
-    </div>
-    <div>
-        <table>
-            <caption>Participants</caption>
-            <thead>
-            <tr>
-                <th>Pseudo</th>
-                <th>Nom</th>
-            </tr>   
-            </thead>
-            <tbody>
+        <div class="pt-4 pb-2">
+            <p>Organisé par <a href="{{ path('app_profil',{'id':event.planner.id}) }}">{{ event.planner.pseudo }}</a></p>
+        </div>
+        <div>
+            <h2>Date et heure</h2>
+            <p>{{ event.dateTimeStart|date('d/m/Y H:i:s') }}</p>
+        </div>
+        <div>
+            <h2>Lieu</h2>
+            <p></p>
+        </div>
+        <div>
+            <h2>À propos de cet évènement</h2>
+            {% set heures = event.duration|date('G') %}
+            {% set minutes = event.duration|date('i') %}
+            <p>Cet évènement dure {% if heures > 0  %} {{ heures }} heure{{ heures > 1 ? 's' : '' }}{% endif %}{% if minutes > 0 %}{{ minutes|trim('0') }} minute{{ minutes > 1 ? 's' : '' }}{% endif %}
+            </p>
+            <p>Il reste {{ event.maxNbRegistration - event.registered|length }} places sur {{ event.maxNbRegistration }}</p>
+            <p>Inscription avant le {{ event.registrationDeadline|date('d/m/Y à H:i') }}</p>
+            <p>{{ event.infoEvent }}</p>
+        </div>
+        <div>
+            <table>
+                <caption>Participants</caption>
+                <thead>
+                <tr>
+                    <th>Pseudo</th>
+                    <th>Nom</th>
+                </tr>
+                </thead>
+                <tbody>
                 {% for participant in event.registered %}
                     <tr>
                         <td>{{ participant.pseudo }}</td>
                         <td>{{ participant.firstName }} {{ participant.lastName|upper }}</td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    {% if event.state == 'published' %}
-        {% if app.user not in event.registered %}
-            <a href="{{ path('app_event_register',{ 'id':event.id}) }}">S'inscrire</a>
-        {% else %}
-            <a href="{{ path('app_event_unregister',{ 'id':event.id}) }}">Se désister</a>
+                </tbody>
+            </table>
+        </div>
+        {% if event.state == 'published' %}
+            {% if app.user not in event.registered %}
+                <a href="{{ path('app_event_register',{ 'id':event.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">S'inscrire</a>
+            {% else %}
+                <a href="{{ path('app_event_unregister',{ 'id':event.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Se désister</a>
+            {% endif %}
         {% endif %}
-    {% endif %}
+    </div>
 
 {% endblock %}
