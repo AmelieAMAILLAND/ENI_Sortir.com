@@ -39,8 +39,6 @@ class EventRepository extends ServiceEntityRepository
 
     public function findWithMultipleFilters(filtersDTO $filtersDTO): array{
 
-        //dd($filtersDTO);
-
         $query = $this->createQueryBuilder('e')
                 ->select('e') // 'COUNT(e.id) as nbParticipant'
                 ->addSelect('user')
