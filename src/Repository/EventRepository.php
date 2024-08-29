@@ -51,7 +51,8 @@ class EventRepository extends ServiceEntityRepository
 
                 ->addOrderBy('e.state', 'DESC')
                 ->where('e.state IN (:states)')
-                ->setParameter('states', ['published','past','canceled','in_progress']);
+                ->setParameter('states', ['published','in_progress'])
+                ->groupBy('e.id, user.id, site.id, reg_user.id');
 
 
             if($filtersDTO->status){
@@ -78,13 +79,38 @@ class EventRepository extends ServiceEntityRepository
                 $query->andWhere('user.pseudo = :plannerPseudo')
                 ->setParameter('plannerPseudo', $filtersDTO->userPseudo);
             }
+            if($filtersDTO->placeLeft){
+                $query->having('COUNT(reg_user.id) < e.maxNbRegistration');
+
+//                $subQueryCount = $this->createQueryBuilder('subCount')
+//                    ->select('COUNT(registered_user.id)')
+//                    ->from('App\Entity\Event', 'ev')
+//                    ->leftJoin('ev.registered', 'registered_user')
+//                    ->where('ev.id = e.id')
+//                    ->getDQL();
+//
+//                $query->andHaving("($subQueryCount) < e.maxNbRegistration");
+            }
             if($filtersDTO->registered){
                 if($filtersDTO->registered === 'registeredOk'){
-                    $query->andWhere('reg_user.pseudo = :regUserPseudo')
-                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
+
+                    $subQuery = $this->createQueryBuilder('subRegistered')
+                        ->select('1')
+                        ->from('App\Entity\Event', 'ev')
+                        ->leftJoin('ev.registered', 'registered_user')
+                        ->where('ev.id = e.id')
+                        ->andWhere('registered_user.pseudo = :regUserPseudo')
+                        ->getDQL();
+
+                    $query->andWhere(
+                        $query->expr()->exists($subQuery)
+                    )->setParameter('regUserPseudo', $filtersDTO->userPseudo);
+
+//                    $query->andWhere('reg_user.pseudo = :regUserPseudo')
+//                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
                 }
                 if($filtersDTO->registered === 'notRegistered'){
-                    
+
                     //TEST CHATGPT (QUEL BOSS)
                     $subQuery = $this->createQueryBuilder('sub')
                         ->select('1')
@@ -102,10 +128,7 @@ class EventRepository extends ServiceEntityRepository
                         ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
                 }
             }
-
             return $query->getQuery()->getResult();
-
-
     }
 
     //    /**

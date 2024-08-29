@@ -42,7 +42,7 @@
                     <div class="places-planner-container flex justify-between items-center">
                         <div class="placesLeft">
                             <label for="placeLeft">Places restantes</label>
-                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input">
+                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>
                         </div>
                         <div class="planner-container">
                             <label for="isPlanner">Dont je suis organisateur</label>
@@ -52,7 +52,7 @@
                     <div class="registered-container flex justify-between ">
                         <div class="all-container">
                             <label for="registeredAll">Peu importe</label>
-                            <input type="radio" name="registered" value="all" id="registeredAll" {{ filters.registered == "all" ? 'checked' : '' }}>
+                            <input type="radio" name="registered" value="all" id="registeredAll" {{ filters.registered == "all" or filters.registered is null ? 'checked' : '' }}>
                         </div>
                         <div class="registeredOk-container">
                             <label for="registeredOk">Inscrit</label>
@@ -99,7 +99,7 @@
 
                 </div>
                 <div class="place-container">
-                    <p>{{ event.maxNbRegistration }} places</p>
+                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>
                 </div>
                 <div class="desc-container">
                     <p>{{ event.infoEvent }}</p>
