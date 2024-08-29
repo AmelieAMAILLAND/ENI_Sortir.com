@@ -19,6 +19,9 @@
                 {{ form_row(form.infoEvent) }}
             </div>
             <div>
+                {{ form_row(form.place) }}
+            </div>
+            <div>
                 {% if event.state=='created' %}
                     {{ form_row(form.submit) }}
                     {{ form_row(form.publish) }}
