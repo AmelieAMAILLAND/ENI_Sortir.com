@@ -6,6 +6,7 @@ use App\DTO\filtersDTO;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\PlaceRepository;
 use App\Repository\SiteRepository;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/event', name: 'app_event')]
@@ -49,9 +51,23 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
     {
         $event = new Event();
+        /*$savedData = $session->get('event_form_data');
+
+        if ($savedData) {
+            $event = $savedData;
+            $session->remove('event_form_data');
+        }*/
+
+        $newPlaceId = $request->query->get('newPlaceId');
+        if ($newPlaceId) {
+            $newPlace = $placeRepository->find($newPlaceId);
+            if ($newPlace) {
+                $event->setPlace($newPlace);
+            }
+        }
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
@@ -97,29 +113,36 @@ class EventController extends AbstractController
 
 
     #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
     {
         $owner = $event->getPlanner();
         if ($owner===$this->getUser() && ($event->getState()==='created' || $event->getState()==='published')) {
-                $form = $this->createForm(EventType::class, $event);
-                $form->handleRequest($request);
-
-                if ($form->isSubmitted() && $form->isValid()) {
-                    if ($form->get('publish')->isClicked()) {
-                        $event->setState('published');
-                    } else {
-                        $event->setState('created');
-                    }
-                    $entityManager->flush();
-
-                    return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            $newPlaceId = $request->query->get('newPlaceId');
+            if ($newPlaceId) {
+                $newPlace = $placeRepository->find($newPlaceId);
+                if ($newPlace) {
+                    $event->setPlace($newPlace);
                 }
+            }
+            $form = $this->createForm(EventType::class, $event);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                if ($form->get('publish')->isClicked()) {
+                    $event->setState('published');
+                } else {
+                    $event->setState('created');
+                }
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+            }
 
 
-                return $this->render('event/edit.html.twig', [
-                    'event' => $event,
-                    'form' => $form,
-                ]);
+            return $this->render('event/edit.html.twig', [
+                'event' => $event,
+                'form' => $form,
+            ]);
         }
         elseif ($owner!==$this->getUser()){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur' );
