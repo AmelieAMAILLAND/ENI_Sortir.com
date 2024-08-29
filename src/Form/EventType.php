@@ -36,6 +36,9 @@ class EventType extends AbstractType
                 'label' => 'Description et infos',
                 'required' => false
             ])
+            ->add('place', PlaceType::class,[
+                'label' => false,
+            ])
             ->add('submit', SubmitType::class,[
                 'label'=>'Enregistrer',
                 'row_attr'=>[
