@@ -28,6 +28,10 @@ class ProfileController extends AbstractController
     public function showProfil(int $id, UserRepository $userRepository): Response
     {
         $user = $userRepository->find($id);
+        if (!$user){
+            $this->addFlash('danger', 'Cet utilisateur n\'existe pas');
+            return $this->redirectToRoute('app_event_index');
+        }
 
         return $this->render('profile/profile.html.twig', [
             'user' => $user,

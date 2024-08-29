@@ -26,7 +26,7 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByIdWithRegistered(int $id): Event
+    public function findByIdWithRegistered(int $id): ?Event
     {
         return $this->createQueryBuilder('e')
             ->addSelect('user')
