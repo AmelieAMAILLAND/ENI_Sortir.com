@@ -17,7 +17,6 @@ class filtersDTO
         public ?string $endDate,
         public ?string $registered,
         public ?bool $isPlanner,
-        public ?bool $placeLeft,
         public ?string $userPseudo,
     )
     {
