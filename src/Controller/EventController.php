@@ -29,7 +29,7 @@ class EventController extends AbstractController
         $events = [];
         $events = $eventRepository->findWithMultipleFilters($filtersDTO);
 
-        $statusArray = ['published' , 'in_progress', 'past', 'canceled'];
+        $statusArray = ['published', 'in_progress'];
 
         $sites = $siteRepository->findAll();
         

@@ -49,7 +49,7 @@ class EventRepository extends ServiceEntityRepository
                 ->innerJoin('user.site', 'site')
                 ->leftJoin('e.registered', 'reg_user')
 
-                ->addOrderBy('e.state', 'DESC')
+                ->addOrderBy('e.dateTimeStart', 'ASC')
                 ->where('e.state IN (:states)')
                 ->setParameter('states', ['published','in_progress'])
                 ->groupBy('e.id, user.id, site.id, reg_user.id');
@@ -82,14 +82,6 @@ class EventRepository extends ServiceEntityRepository
             if($filtersDTO->placeLeft){
                 $query->having('COUNT(reg_user.id) < e.maxNbRegistration');
 
-//                $subQueryCount = $this->createQueryBuilder('subCount')
-//                    ->select('COUNT(registered_user.id)')
-//                    ->from('App\Entity\Event', 'ev')
-//                    ->leftJoin('ev.registered', 'registered_user')
-//                    ->where('ev.id = e.id')
-//                    ->getDQL();
-//
-//                $query->andHaving("($subQueryCount) < e.maxNbRegistration");
             }
             if($filtersDTO->registered){
                 if($filtersDTO->registered === 'registeredOk'){
@@ -111,7 +103,6 @@ class EventRepository extends ServiceEntityRepository
                 }
                 if($filtersDTO->registered === 'notRegistered'){
 
-                    //TEST CHATGPT (QUEL BOSS)
                     $subQuery = $this->createQueryBuilder('sub')
                         ->select('1')
                         ->from('App\Entity\Event', 'ev')
