@@ -48,16 +48,47 @@ class EventRepository extends ServiceEntityRepository
                 ->leftJoin('e.registered', 'reg_user')
 
                 ->addOrderBy('e.dateTimeStart', 'ASC')
+                ->addOrderBy('e.registrationDeadline', 'ASC')
                 ->where('e.state IN (:states)')
-                ->setParameter('states', ['published','in_progress'])
+                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
                 ->groupBy('e.id, user.id, site.id, reg_user.id');
 
 
-            if($filtersDTO->status){
-                $query->andWhere('e.state = :status')
-                        ->setParameter('status', $filtersDTO->status);
+            if($filtersDTO->status != 'all'){
+                if($filtersDTO->status == 'Ouverte'){
+                    $query->having('COUNT(reg_user.id) < e.maxNbRegistration')
+                        ->andWhere('e.registrationDeadline > :currentDate')
+                        ->setParameter('currentDate', (new \DateTime())->modify('+2 hours'));
+                }
+                if($filtersDTO->status == 'Passée'){
+                    $now = (new \DateTime())->modify('+2 hours'); //Fuseau horaire relou ...
+                    $nowMinusOneMonth = (clone $now)->modify('-1 month');
+
+                    $query->andWhere('e.dateTimeStart < :currentDate')
+                        ->andWhere('e.dateTimeStart > :oneMonthAgo')
+                        ->setParameter('currentDate',$now)
+                        ->setParameter('oneMonthAgo',$nowMinusOneMonth);
+                }
+                if($filtersDTO->status == 'Fermée'){
+
+                    $now = (new \DateTime())->modify('+2 hours');
+
+                    $query->andWhere('e.dateTimeStart > :currentDate')
+                        ->andWhere('e.registrationDeadline < :currentDate')
+                        ->setParameter('currentDate',$now);
+                }
+                //Fonctionne pas ... limité pour faires des opérations entre champs de l'entité (dateStart + duration ...)
+//                if($filtersDTO->status == 'En_cours'){
+//                    $now = (new \DateTime())->modify('+2 hours');
+//
+//                    // Ajouter une expression native SQL pour calculer la date de fin
+//                    $query->andWhere('e.dateTimeStart <= :currentDate')
+//                        ->andWhere("(:currentDate BETWEEN e.dateTimeStart AND (e.dateTimeStart + e.duration::INTERVAL))")
+//                        ->setParameter('currentDate', $now);
+//                }
+
             }
-            if($filtersDTO->siteName){
+            if($filtersDTO->siteName != 'all'){
                 $query->andWhere('site.name = :siteName')
                     ->setParameter('siteName', $filtersDTO->siteName);
             }
@@ -76,10 +107,6 @@ class EventRepository extends ServiceEntityRepository
             if($filtersDTO->isPlanner){
                 $query->andWhere('user.pseudo = :plannerPseudo')
                 ->setParameter('plannerPseudo', $filtersDTO->userPseudo);
-            }
-            if($filtersDTO->placeLeft){
-                $query->having('COUNT(reg_user.id) < e.maxNbRegistration');
-
             }
             if($filtersDTO->registered){
                 if($filtersDTO->registered === 'registeredOk'){

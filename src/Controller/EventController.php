@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
@@ -27,18 +28,26 @@ class EventController extends AbstractController
                          // #[MapQueryString] filtersDTO $filtersDTO
     ): Response
     {
-        $filtersDTO = new FiltersDTO(null,null,null,null,null,null,null,null,null);
+        $user = $this->getUser();
+
+        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null,null);
 
         $filters = $request->query->all();
         if($filters) {
             foreach ($filters as $key => $value) {
-                $filtersDTO->$key = $value;
+                if(!$value == null){ //Si value pas nulle alors on l'affecte (SI "" ALORS ON AFFECTE AUSSI ATTENTION pour le cas sans filtres")
+                    $filtersDTO->$key = $value;
+                }
             }
         }
 
         $events = $eventRepository->findWithMultipleFilters($filtersDTO);
 
-        $statusArray = ['published', 'in_progress'];
+        //Parmis tous les évènements récupérés, on les gardes tous sauf ceux pas encore publiés et dont on n'est pas l'organisateur.
+        //Donc on garde ceux qui sont en 'createdé et dont on est l'organisateur ET ceux qui sont pas en 'created'.
+        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'created')) || ($event->getState() != 'created'));
+
+        $statusArray = ['Ouverte', 'Passée', 'Fermée'];
 
         $sites = $siteRepository->findAll();
         

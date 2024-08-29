@@ -12,7 +12,7 @@
                     <div class="status-container">
                         <label for="status">Statut</label>
                         <select name="status" id="status" class="js-select-input rounded-md">
-                            <option value="">Tous les statuts</option>
+                            <option value="all">Tous les statuts</option>
                             {% for status in statusArray %}
                                 <option value="{{ status }}" {{ filters.status == status ? 'selected' : ''}}>{{ status }}</option>
                             {% endfor %}
@@ -21,7 +21,7 @@
                     <div class="site-container">
                         <label for="siteName">Site</label>
                         <select name="siteName" id="siteName" class="js-select-input rounded-md">
-                            <option value="">Tous les sites</option>
+                            <option value="all">Tous les sites</option>
                             {% for site in sites %}
                                 <option value="{{ site.name }}" {{ filters.siteName == site.name ? 'selected' : ''}}>{{ site }}</option>
                             {% endfor %}
@@ -40,10 +40,10 @@
                 </div>
                 <div class="checkboxes-container">
                     <div class="places-planner-container flex justify-between items-center">
-                        <div class="placesLeft">
-                            <label for="placeLeft">Places restantes</label>
-                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>
-                        </div>
+{#                        <div class="placesLeft">#}
+{#                            <label for="placeLeft">Places restantes</label>#}
+{#                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>#}
+{#                        </div>#}
                         <div class="planner-container">
                             <label for="isPlanner">Dont je suis organisateur</label>
                             <input type="checkbox" id="isPlanner" name="isPlanner" {{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input">
@@ -143,7 +143,7 @@
 
         function handleFormReset(e){
             e.preventDefault();
-            selectInputs.forEach(selectInput => selectInput.value = "");
+            selectInputs.forEach(selectInput => selectInput.value = "all");
             nameInput.value = "";
             dateInputs.forEach(dateInput => dateInput.value = "");
             checkboxes.forEach(checkbox=>checkbox.checked = false);
