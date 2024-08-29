@@ -18,8 +18,9 @@
                 {{ form_row(form.maxNbRegistration) }}
                 {{ form_row(form.infoEvent) }}
             </div>
-            <div>
+            <div class="flex-row">
                 {{ form_row(form.place) }}
+                <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">+</a>
             </div>
             <div>
                 {% if event.state=='created' %}
