@@ -29,7 +29,7 @@
                 {% endif %}
 
                 <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                    <a href="{{ path('app_event_index') }}{{ "?status=" }}">Sorties</a>
+                    <a href="{{ path('app_event_index') }}">Sorties</a>
                 </li>
 
                 {% if is_granted('ROLE_USER') %}

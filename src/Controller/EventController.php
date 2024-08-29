@@ -21,12 +21,18 @@ class EventController extends AbstractController
     public function index(EventRepository $eventRepository,
                           SiteRepository $siteRepository,
                           Request $request,
-                          #[MapQueryString] filtersDTO $filtersDTO
+                         // #[MapQueryString] filtersDTO $filtersDTO
     ): Response
     {
-        //dd($filtersDTO);
+        $filtersDTO = new FiltersDTO(null,null,null,null,null,null,null,null,null);
 
-        $events = [];
+        $filters = $request->query->all();
+        if($filters) {
+            foreach ($filters as $key => $value) {
+                $filtersDTO->$key = $value;
+            }
+        }
+
         $events = $eventRepository->findWithMultipleFilters($filtersDTO);
 
         $statusArray = ['published', 'in_progress'];

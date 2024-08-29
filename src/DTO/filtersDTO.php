@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class filtersDTO
 {
 
+
     public function __construct(
 
         public ?string $nameInput,
