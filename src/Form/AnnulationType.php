@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +15,7 @@ class AnnulationType extends AbstractType
     {
         $builder
             ->add('annulation', TextareaType::class, [
-                'label' => 'Motif d\'annulation',
+                'label' => 'Motif :',
                 'required' => true,
             ]);
     }

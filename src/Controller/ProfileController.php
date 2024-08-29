@@ -18,7 +18,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ProfileController extends AbstractController
 {
     #[Route('/profil/{id?}', name: 'app_profil', requirements: ['id' => '\d+'])]
-    public function profile(UserInterface $user = null, int $id = null, UserRepository $userRepository, NotificationRepository $notificationRepository): Response
+    public function profile(UserInterface $user = null, int $id = null, UserRepository $userRepository): Response
     {
 
         // Si un ID est fourni, on cherche l'utilisateur correspondant

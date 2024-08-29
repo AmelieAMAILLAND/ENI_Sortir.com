@@ -3,33 +3,42 @@
 {% block title %}Annuler une sortie{% endblock %}
 
 {% block body %}
-    <h1>Annuler la sortie</h1>
+    <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex flex-col">
+        <h1 class="mb-3 font-semibold text-center">Annuler la sortie</h1>
 
-    {{ form_start(form) }}
-    <div>
-        <label>Nom de la sortie :</label>
-        <span>{{ event.name }}</span>
+        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+
+        <div class="flex items-center space-x-2">
+            <label class="font-medium text-gray-700">Nom de la sortie :</label>
+            <span class="text-gray-900">{{ event.name }}</span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <label class="font-medium text-gray-700">Date de la sortie :</label>
+            <span class="text-gray-900">{{ event.dateTimeStart|date('d/m/Y') }}</span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <label class="font-medium text-gray-700">Site organisateur :</label>
+            <span class="text-gray-900">{{ app.user.site }}</span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <label class="font-medium text-gray-700">Lieu :</label>
+            <span class="text-gray-900">{{ event.place.name }}</span>
+        </div>
+
+        <div>
+            {{ form_row(form.annulation, {'attr': {'class': 'mt-2 border border-gray-300 rounded p-2 w-full'}}) }}
+        </div>
+
+        <div class="flex space-x-4 mt-4">
+            <button type="submit" class="bg-amber-400 text-white py-2 px-4 rounded-md hover:opacity-80">Enregistrer l'annulation</button>
+            <a href="{{ path('app_event_edit', {'id': event.id}) }}">
+                <button type="button" class="bg-amber-400 text-white py-2 px-4 rounded-md hover:opacity-80">Retour</button>
+            </a>
+        </div>
+
+        {{ form_end(form) }}
     </div>
-    <div>
-        <label>Date de la sortie :</label>
-        <span>{{ event.dateTimeStart|date('d/m/Y') }}</span>
-    </div>
-    {#  <div>
-        <label>Site organisateur :</label>
-        <span>{{ site.siteOrganisateur }}</span>
-    </div>
-    <div>
-        <label>Lieu :</label>
-        <span>{{ event.lieu }}</span>
-    </div>#}
-    <div>
-        {{ form_row(form.annulation) }}
-    </div>
-    <div>
-        <button type="submit">Enregistrer l'annulation</button>
-        <a href="{{ path('app_event_edit', {'id': event.id}) }}">
-            <button type="button">Retour</button>
-        </a>
-    </div>
-    {{ form_end(form) }}
 {% endblock %}
