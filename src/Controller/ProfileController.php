@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\UpdateProfileType;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,25 +17,31 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProfileController extends AbstractController
 {
-    #[Route('/mon_profile', name: 'app_monProfile')]
-    public function monProfile(UserInterface $user): Response
+    #[Route('/profil/{id?}', name: 'app_profil', requirements: ['id' => '\d+'])]
+    public function profile(UserInterface $user = null, int $id = null, UserRepository $userRepository, NotificationRepository $notificationRepository): Response
     {
+        // Si un ID est fourni, on cherche l'utilisateur correspondant
+        if ($id !== null) {
+            $user = $userRepository->find($id);
+        }
+
+        // Si aucun ID n'est fourni, on utilise l'utilisateur actuellement connecté
+        if ($id === null && $user === null) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à votre profil.');
+        }
+
+        // Récupération des notifications non lues pour cet utilisateur
+        $notifications = $notificationRepository->findUnreadNotificationsByUser($user);
+
         return $this->render('Profile/profile.html.twig', [
             'user' => $user,
+            'notifications' => $notifications,
         ]);
     }
 
-    #[Route('/profil/{id}', name: 'app_profil', requirements: ['id'=>'\d+'])]
-    public function showProfil(int $id, UserRepository $userRepository): Response
-    {
-        $user = $userRepository->find($id);
 
-        return $this->render('Profile/profile.html.twig', [
-            'user' => $user,
-        ]);
-    }
 
-    #[Route('/mon_profile/modifier', name: 'app_modifierProfile')]
+    #[Route('/profil/modifier', name: 'app_modifierProfile')]
     public function edit(Request $request,
                          EntityManagerInterface $entityManager,
                          SluggerInterface $slugger,
@@ -79,7 +86,7 @@ class ProfileController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_monProfile');
+            return $this->redirectToRoute('app_profil');
         }
 
         return $this->render('profile/modifier_profile.html.twig', [
