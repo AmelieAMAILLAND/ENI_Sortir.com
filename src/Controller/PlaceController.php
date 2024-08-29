@@ -76,8 +76,11 @@ class PlaceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $newPlaceId = $place->getId();
+
             $previousUrl = $session->get('previous_url', $this->generateUrl('app_event_index'));
-            return $this->redirect($previousUrl);
+            $redirectUrl = $previousUrl . (parse_url($previousUrl, PHP_URL_QUERY) ? '&' : '?') . 'newPlaceId=' . $newPlaceId;
+            return $this->redirect($redirectUrl);
         }
 
         return $this->render('place/edit.html.twig', [

@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/event', name: 'app_event')]
@@ -37,9 +38,16 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
     {
         $event = new Event();
+        /*$savedData = $session->get('event_form_data');
+
+        if ($savedData) {
+            $event = $savedData;
+            $session->remove('event_form_data');
+        }*/
+
         $newPlaceId = $request->query->get('newPlaceId');
         if ($newPlaceId) {
             $newPlace = $placeRepository->find($newPlaceId);
