@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\filtersDTO;
 use App\Entity\Event;
+use App\Form\AnnulationType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\PlaceRepository;
@@ -179,24 +180,44 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
+
+    // src/Controller/EventController.php
+
+    #[Route('/{id}/cancel', name: '_cancel', methods: ['GET', 'POST'])]
+    public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    {
+       
+
     #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function cancel(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
     {
-        if (!$event){
-            $this->addFlash('danger', 'Vous ne pouvez annuler cet évènement car il n\'existe pas.');
+         // Vérifier si l'utilisateur a les droits nécessaires
+        if ($event->getPlanner() !== $this->getUser()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas annuler cet évènement car vous n\'en êtes pas l\'organisateur.');
             return $this->redirectToRoute('app_event_index');
         }
-        if ($this->isCsrfTokenValid('cancel'.$event->getId(), $request->getPayload()->getString('cancel_token'))) {
+
+        $form = $this->createForm(AnnulationType::class, $event);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
             $event->setState('canceled');
-            $entityManager->persist($event);
             $entityManager->flush();
+
+            return $this->redirectToRoute('app_event_index');
         }
 
-        return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
+        return $this->render('event/cancel.html.twig', [
+            'event' => $event,
+            'form' => $form->createView(),
+        ]);
     }
 
+
+
     #[Route('/{id}/register', name: '_register', requirements: ['id' => '\d+'])]
-    public function register(?Event $event, EntityManagerInterface $entityManager): Response
+    public function register(Event $event, EntityManagerInterface $entityManager): Response    
     {
         if (!$event){
             $this->addFlash('danger', 'Vous ne pouvez pas vous inscrire à un évènement inexistant');

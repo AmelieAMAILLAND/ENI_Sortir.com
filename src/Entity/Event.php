@@ -51,9 +51,14 @@ class Event
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'registeredFor')]
     private Collection $registered;
 
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $annulation = null;
+
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'event')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Place $place = null;
+
 
     public function __construct()
     {
@@ -168,6 +173,18 @@ class Event
     public function getRegistered(): Collection
     {
         return $this->registered;
+    }
+
+    public function getAnnulation(): ?string
+    {
+        return $this->annulation;
+    }
+
+    public function setAnnulation(?string $annulation): self
+    {
+        $this->annulation = $annulation;
+
+        return $this;
     }
 
     public function addRegistered(User $registered): static
