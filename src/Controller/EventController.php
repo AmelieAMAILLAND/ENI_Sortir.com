@@ -2,36 +2,49 @@
 
 namespace App\Controller;
 
+use App\DTO\filtersDTO;
 use App\Entity\Event;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\SiteRepository;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {
     #[Route('/', name: '_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository, Request $request): Response
+    public function index(EventRepository $eventRepository,
+                          SiteRepository $siteRepository,
+                          Request $request,
+                         // #[MapQueryString] filtersDTO $filtersDTO
+    ): Response
     {
-        $status = $request->query->get('status', null);
+        $filtersDTO = new FiltersDTO(null,null,null,null,null,null,null,null,null);
 
-        if ($status) {
-            $events = $eventRepository->findByStatus($status);
-        } else {
-            $events = $eventRepository->findAll(); // Ou toute autre méthode de récupération des données
+        $filters = $request->query->all();
+        if($filters) {
+            foreach ($filters as $key => $value) {
+                $filtersDTO->$key = $value;
+            }
         }
 
-        $statusArray = ['published', 'created', 'in_progress', 'past', 'canceled'];
+        $events = $eventRepository->findWithMultipleFilters($filtersDTO);
+
+        $statusArray = ['published', 'in_progress'];
+
+        $sites = $siteRepository->findAll();
         
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'currentStatus' => $status,
             'statusArray' => $statusArray,
+            'sites'=>$sites,
+            'filters'=>$filtersDTO
         ]);
     }
 
