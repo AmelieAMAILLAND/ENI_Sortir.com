@@ -5,51 +5,73 @@
 {% block body %}
     <h1 class="text-center text-3xl font-semibold my-3">Les sorties</h1>
 
-{#    <table class="table-fixed max-w-[1300px] mx-auto border border-slate-500 rounded-md shadow-md py-3">#}
-{#        <thead>#}
-{#            <tr>#}
-{#                <th class="py-1 px-2 text-xl text-center ">Nom</th>#}
-{#                <th class="text-xl text-center ">Durée</th>#}
-{#                <th class="text-xl text-center ">Début</th>#}
-{#                <th class="text-xl text-center ">Date limite</th>#}
-{#                <th class="text-xl text-center ">Places</th>#}
-{#                <th class="text-xl text-center ">Description</th>#}
-{#                <th class="text-xl text-center ">État</th>#}
-{#                <th class="text-xl text-center ">Actions</th>#}
-{#            </tr>#}
-{#        </thead>#}
-{#        <tbody>#}
-{#        {% for event in events %}#}
-{#            <tr>#}
-{#                <td>{{ event.name }}</td>#}
-{#                <td>{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
-{#                <td>{{ event.dateTimeStart ? event.dateTimeStart|date('Y-m-d H:i:s') : '' }}</td>#}
-{#                <td>{{ event.registrationDeadline ? event.registrationDeadline|date('Y-m-d H:i:s') : '' }}</td>#}
-{#                <td>{{ event.maxNbRegistration }}</td>#}
-{#                <td>{{ event.infoEvent }}</td>#}
-{#                <td>{{ event.state }}</td>#}
-{#                <td>#}
-{#                    <a href="{{ path('app_event_show', {'id': event.id}) }}">VOIR</a>#}
-{#                    <a href="{{ path('app_event_edit', {'id': event.id}) }}">MODIFIER</a>#}
-{#                </td>#}
-{#            </tr>#}
-{#        {% else %}#}
-{#            <tr>#}
-{#                <td colspan="9">no records found</td>#}
-{#            </tr>#}
-{#        {% endfor %}#}
-{#        </tbody>#}
-{#    </table>#}
+    <div class="form-container mb-6 border border-slate-500 py-4 px-6 max-w-[1200px] mx-auto shadow-md rounded-md">
+        <form method="GET" class="flex justify-between">
+            <div class="filters-container flex flex-col gap-2 min-w-[50%]">
+                <div class="status-site-container flex gap-3 justify-between">
+                    <div class="status-container">
+                        <label for="status">Statut</label>
+                        <select name="status" id="status" class="js-select-input rounded-md">
+                            <option value="all">Tous les statuts</option>
+                            {% for status in statusArray %}
+                                <option value="{{ status }}" {{ filters.status == status ? 'selected' : ''}}>{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="site-container">
+                        <label for="siteName">Site</label>
+                        <select name="siteName" id="siteName" class="js-select-input rounded-md">
+                            <option value="all">Tous les sites</option>
+                            {% for site in sites %}
+                                <option value="{{ site.name }}" {{ filters.siteName == site.name ? 'selected' : ''}}>{{ site }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="name-container flex gap-2 items-center justify-center">
+                    <label for="nameInput">Nom contenant </label>
+                    <input type="text" name="nameInput" id="nameInput" placeholder="..." value="{{ filters.nameInput }}" class="flex-grow rounded-md">
+                </div>
+                <div class="dates-container flex justify-between items-center">
+                    <label for="beginDate">Entre </label>
+                    <input type="datetime-local" name="beginDate" id="beginDate" value="{{ filters.beginDate }}" class="js-date-input rounded-md">
+                    <label for="endDate"> et </label>
+                    <input type="datetime-local" name="endDate" id="endDate" value="{{ filters.endDate }}" class="js-date-input rounded-md">
+                </div>
+                <div class="checkboxes-container">
+                    <div class="places-planner-container flex justify-between items-center">
+{#                        <div class="placesLeft">#}
+{#                            <label for="placeLeft">Places restantes</label>#}
+{#                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>#}
+{#                        </div>#}
+                        <div class="planner-container">
+                            <label for="isPlanner">Dont je suis organisateur</label>
+                            <input type="checkbox" id="isPlanner" name="isPlanner" {{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input">
+                        </div>
+                    </div>
+                    <div class="registered-container flex justify-between ">
+                        <div class="all-container">
+                            <label for="registeredAll">Peu importe</label>
+                            <input type="radio" name="registered" value="all" id="registeredAll" {{ filters.registered == "all" or filters.registered is null ? 'checked' : '' }}>
+                        </div>
+                        <div class="registeredOk-container">
+                            <label for="registeredOk">Inscrit</label>
+                            <input type="radio" name="registered" value="registeredOk" id="registeredOk" {{ filters.registered == "registeredOk" ? 'checked' : '' }}>
+                        </div>
+                        <div class="notRegistered-container">
+                            <label for="notRegistered">Non inscrit</label>
+                            <input type="radio" name="registered" value="notRegistered" id="notRegistered" {{ filters.registered == "notRegistered" ? 'checked' : '' }}>
+                        </div>
+                    </div>
+                    <input type="hidden" value="{{ app.user.pseudo }}" name="userPseudo">
+                </div>
+            </div>
 
-    <div class="filter">
-        <form method="GET">
-            <select name="status">
-                <option value="">Tous les statuts</option>
-                {% for status in statusArray %}
-                    <option value="{{ status }}" {{ currentStatus == status ? 'selected' : ''}}>{{ status }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Filtrer</button>
+            <div class="btns-container min-w-[30%] flex flex-col items-center justify-center gap-4">
+                <button type="submit" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
+                <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-slate-600 text-white hover:opacity-80 shadow-md">Réinitialiser</button>
+            </div>
+
         </form>
     </div>
     
@@ -68,10 +90,16 @@
                         <p class="font-semibold">Date limite : </p>
                         <p> {{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y - H:i') : '' }}</p>
                     </div>
-                    <p>Inscrit OU Pas</p>
+
+                    {% if app.user in event.registered %}
+                        <img src="{{ asset('images/registered.svg') }}" alt="icone correcte" class="w-10">
+                    {% else %}
+                        <img src="{{ asset('images/notRegistered.svg') }}" alt="icone fausse" class="w-10">
+                    {% endif %}
+
                 </div>
                 <div class="place-container">
-                    <p>{{ event.maxNbRegistration }} places</p>
+                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>
                 </div>
                 <div class="desc-container">
                     <p>{{ event.infoEvent }}</p>
@@ -84,13 +112,15 @@
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
                     <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
-                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
+                    {% if event.planner.pseudo == app.user.pseudo %}
+                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
+                    {% endif %}
                 </div>
             </div>
 
         {% else %}
             <div>
-                <p>No events found.</p>
+                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>
             </div>
         {% endfor %}
 
@@ -99,4 +129,26 @@
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
+
+    <script defer>
+        const resetBtn = document.getElementById('reset-filters-btn');
+
+        const selectInputs = [...document.querySelectorAll('.js-select-input')];
+        const nameInput = document.getElementById('nameInput');
+        const dateInputs = [...document.querySelectorAll('.js-date-input')];
+        const checkboxes = [...document.querySelectorAll('.js-checkboxes-input')];
+        const defaultRadioBtn = document.getElementById('registeredAll');
+
+        resetBtn.addEventListener('click', handleFormReset)
+
+        function handleFormReset(e){
+            e.preventDefault();
+            selectInputs.forEach(selectInput => selectInput.value = "all");
+            nameInput.value = "";
+            dateInputs.forEach(dateInput => dateInput.value = "");
+            checkboxes.forEach(checkbox=>checkbox.checked = false);
+            defaultRadioBtn.checked = true;
+        }
+
+    </script>
 {% endblock %}

@@ -20,22 +20,25 @@ class ProfileController extends AbstractController
     #[Route('/profil/{id?}', name: 'app_profil', requirements: ['id' => '\d+'])]
     public function profile(UserInterface $user = null, int $id = null, UserRepository $userRepository, NotificationRepository $notificationRepository): Response
     {
+
         // Si un ID est fourni, on cherche l'utilisateur correspondant
         if ($id !== null) {
             $user = $userRepository->find($id);
         }
 
+        if (!$user){
+            $this->addFlash('danger', 'Cet utilisateur n\'existe pas');
+            return $this->redirectToRoute('app_event_index');
+        }
         // Si aucun ID n'est fourni, on utilise l'utilisateur actuellement connecté
         if ($id === null && $user === null) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à votre profil.');
         }
 
-        // Récupération des notifications non lues pour cet utilisateur
-        $notifications = $notificationRepository->findUnreadNotificationsByUser($user);
+        
 
-        return $this->render('Profile/profile.html.twig', [
+        return $this->render('profile/profile.html.twig', [
             'user' => $user,
-            'notifications' => $notifications,
         ]);
     }
 

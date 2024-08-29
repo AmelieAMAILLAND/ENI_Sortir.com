@@ -3,7 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Event;
+use App\Entity\Place;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,6 +39,12 @@ class EventType extends AbstractType
             ->add('infoEvent', null, [
                 'label' => 'Description et infos',
                 'required' => false
+            ])
+            ->add('place', EntityType::class,[
+                'label' => 'lieu',
+                'class' => Place::class,
+                'choice_label' => 'name',
+                'placeholder'=>' --Choisissez un lieu pour la sortie-- ',
             ])
             ->add('submit', SubmitType::class,[
                 'label'=>'Enregistrer',

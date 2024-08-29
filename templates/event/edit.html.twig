@@ -18,6 +18,11 @@
                 {{ form_row(form.maxNbRegistration) }}
                 {{ form_row(form.infoEvent) }}
             </div>
+            <div class="flex-row">
+                {{ form_row(form.place) }}
+                <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">+</a>
+                <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">&#x270e;</a>
+            </div>
             <div>
                 {% if event.state=='created' %}
                     {{ form_row(form.submit) }}
@@ -33,4 +38,8 @@
         {% if app.current_route=='app_event_edit' and event.state=='published'%} {{ include('event/_cancel_form.html.twig') }} {% endif %}
 
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('JavaScript/eventEdit.js') }}"></script>
 {% endblock %}
