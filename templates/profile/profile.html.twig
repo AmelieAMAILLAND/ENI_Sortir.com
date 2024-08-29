@@ -3,14 +3,14 @@
 {% block title %}Mon Profile{% endblock %}
 
 {% block body %}
-
-    <div class="mt-4 container mx-auto grid grid-cols-[1fr_2fr_1fr] gap-4">
-
+    <div class="mt-4 container mx-auto grid lg:grid-cols-[1fr_2fr_1fr] gap-4">
         <div class="flex items-center justify-center">
-            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}" data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}" alt="Ma photo" style="width: 250px; height: 250px;">
+            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}"
+                 data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}"
+                 alt="Ma photo" class="w-[250px] h-[250px]">
         </div>
 
-        <div class="mx-auto">
+        <div class="lg:col-span-2 order-1 lg:order-none mx-auto">
             <div class="py-2 w-fit flex flex-col justify-center">
                 <h1 class="text-center text-2xl font-semibold mb-2">{{ user.pseudo }}</h1>
                 <div class="bg-amber-50 rounded-md p-4 shadow-md min-w-fit w-[300px]">
@@ -28,6 +28,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 {% endblock %}
