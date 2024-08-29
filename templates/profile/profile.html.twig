@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profile{% endblock %}
+
+{% block body %}
+
+    <div class="mt-4 container mx-auto grid grid-cols-[1fr_2fr_1fr] gap-4">
+
+        <div class="flex items-center justify-center">
+            <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}" data-default-src="{{ asset('images/profile/ajouter_des_photos.png') }}" alt="Ma photo" style="width: 250px; height: 250px;">
+        </div>
+
+        <div class="mx-auto">
+            <div class="py-2 w-fit flex flex-col justify-center">
+                <h1 class="text-center text-2xl font-semibold mb-2">{{ user.pseudo }}</h1>
+                <div class="bg-amber-50 rounded-md p-4 shadow-md min-w-fit w-[300px]">
+                    <p class="flex justify-between gap-3 mb-1"><span class="font-semibold">Prénom : </span>{{ user.firstName }}</p>
+                    <p class="flex justify-between gap-3 mb-1"><span class="font-semibold">Nom : </span>{{ user.lastName }}</p>
+                    <p class="flex justify-between gap-3 mb-1"><span class="font-semibold">Téléphone : </span>{{ user.phone }}</p>
+                    <p class="flex justify-between gap-3 mb-1"><span class="font-semibold">Email : </span>{{ user.email }}</p>
+                    <p class="flex justify-between gap-3 mb-1"><span class="font-semibold">Site de rattachement : </span>{{ user.site.name }}</p>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="{{ path('app_modifierProfile') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Modifier mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

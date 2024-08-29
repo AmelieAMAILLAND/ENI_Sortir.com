@@ -7,9 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity('name')]
 class Event
 {
     #[ORM\Id]
@@ -17,7 +19,8 @@ class Event
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 30, unique: true)]
+
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -47,6 +50,10 @@ class Event
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'registeredFor')]
     private Collection $registered;
+
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'event')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Place $place = null;
 
     public function __construct()
     {
@@ -175,6 +182,23 @@ class Event
     public function removeRegistered(User $registered): static
     {
         $this->registered->removeElement($registered);
+
+        return $this;
+    }
+
+    public function getDurationInSeconds(): int
+    {
+        return $this->duration->format('H')*3600+$this->duration->format('i')*60;
+    }
+
+    public function getPlace(): ?Place
+    {
+        return $this->place;
+    }
+
+    public function setPlace(?Place $place): static
+    {
+        $this->place = $place;
 
         return $this;
     }

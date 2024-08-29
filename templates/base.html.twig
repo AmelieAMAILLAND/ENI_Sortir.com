@@ -54,7 +54,7 @@
     <main class="flex-grow mt-[80px]">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
-                <div class="alert alert-{{ label }}">{{ message }}</div>
+                <div class="text-red-600">{{ message }}</div>
             {% endfor %}
         {% endfor %}
         {% block body %}{% endblock %}
