@@ -89,11 +89,10 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: '_show', methods: ['GET'])]
+    #[Route('/{id}', name: '_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(EventRepository $eventRepository, int $id): Response
     {
         $event=$eventRepository->findByIdWithRegistered($id);
-//        $event = $eventRepository->findOneById($id);
 
         if (!$event || $event->getState() === 'created') {
             $this->addFlash('danger', 'Cette sortie n\'est pas visible' );
@@ -112,11 +111,15 @@ class EventController extends AbstractController
 
 
 
-    #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
+    #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
     {
+        if (!$event){
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il n\'existe pas');
+            return $this->redirectToRoute('app_event_index');
+        }
         $owner = $event->getPlanner();
-        if ($owner===$this->getUser() && ($event->getState()==='created' || $event->getState()==='published')) {
+        if ($owner === $this->getUser() && ($event->getState() === 'created' || $event->getState() === 'published')) {
             $newPlaceId = $request->query->get('newPlaceId');
             if ($newPlaceId) {
                 $newPlace = $placeRepository->find($newPlaceId);
@@ -143,20 +146,22 @@ class EventController extends AbstractController
                 'event' => $event,
                 'form' => $form,
             ]);
-        }
-        elseif ($owner!==$this->getUser()){
-            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur' );
+        } elseif ($owner !== $this->getUser()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur');
             return $this->redirectToRoute('app_event_index');
         } else {
-            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il est déjà passé ou annulé' );
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il est déjà passé ou annulé');
             return $this->redirectToRoute('app_event_index');
         }
-
     }
 
-    #[Route('/{id}', name: '_delete', methods: ['POST'])]
-    public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: '_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
     {
+        if (!$event){
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer cet évènement car il n\'existe pas. Supprimer le néant est compliqué !');
+            return $this->redirectToRoute('app_event_index');
+        }
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('delete_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
@@ -165,9 +170,13 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'])]
-    public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function cancel(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
     {
+        if (!$event){
+            $this->addFlash('danger', 'Vous ne pouvez annuler cet évènement car il n\'existe pas.');
+            return $this->redirectToRoute('app_event_index');
+        }
         if ($this->isCsrfTokenValid('cancel'.$event->getId(), $request->getPayload()->getString('cancel_token'))) {
             $event->setState('canceled');
             $entityManager->persist($event);
@@ -177,9 +186,13 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/register', name: '_register')]
-    public function register(Event $event, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/register', name: '_register', requirements: ['id' => '\d+'])]
+    public function register(?Event $event, EntityManagerInterface $entityManager): Response
     {
+        if (!$event){
+            $this->addFlash('danger', 'Vous ne pouvez pas vous inscrire à un évènement inexistant');
+            return $this->redirectToRoute('app_event_index');
+        }
         $now = new \DateTime();
         if ($event->getRegistrationDeadline() < $now){
             $this->addFlash('danger', 'INSCRIPTION IMPOSSIBLE : date limite d\'inscription dépassée' );
@@ -194,9 +207,13 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
     }
 
-    #[Route('/{id}/unregister', name: '_unregister')]
-    public function unregister(Event $event, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/unregister', name: '_unregister', requirements: ['id' => '\d+'])]
+    public function unregister(?Event $event, EntityManagerInterface $entityManager): Response
     {
+        if (!$event){
+            $this->addFlash('danger', 'Vous ne pouvez pas vous désister d\'un évènement inexistant');
+            return $this->redirectToRoute('app_event_index');
+        }
         $now = new \DateTime();
         if ($event->getRegistrationDeadline() < $now){
             $this->addFlash('danger', 'DÉSISTEMENT IMPOSSIBLE : date limite d\'inscription dépassée' );
