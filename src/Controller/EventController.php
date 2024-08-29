@@ -181,12 +181,7 @@ class EventController extends AbstractController
     }
 
 
-    // src/Controller/EventController.php
-
-    #[Route('/{id}/cancel', name: '_cancel', methods: ['GET', 'POST'])]
-    public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager): Response
-    {
-       
+    // src/Controller/EventController.php     
 
     #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function cancel(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
