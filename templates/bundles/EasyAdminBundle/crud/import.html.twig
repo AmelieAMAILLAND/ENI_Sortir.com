@@ -1,0 +1,21 @@
+
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Importer un fichier CSV</h1>
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form, { 'method': 'POST', 'attr': { 'enctype': 'multipart/form-data' } }) }}
+                <div class="form-group">
+                    {{ form_label(form.csvFile, 'Fichier CSV') }}
+                    {{ form_widget(form.csvFile, { 'attr': { 'class': 'form-control' } }) }}
+                </div>
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary">Importer</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
