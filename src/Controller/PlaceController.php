@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Place;
 use App\Form\PlaceType;
 use App\Repository\PlaceRepository;
+use App\Service\CallApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ class PlaceController extends AbstractController
     }
 
     #[Route('/new', name: 'app_place_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, CallApiService $apiService): Response
     {
         $currentUrl = $request->getUri();
         $referer = $request->headers->get('referer');
@@ -37,6 +38,10 @@ class PlaceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $adress=str_replace(' ','+',trim($place->getStreet())).'+'.str_replace(' ','+',trim($place->getCity()));
+            $coordinates = $apiService->getCoordinates($adress);
+            $place->setLatitude($coordinates['lat']);
+            $place->setLongitude($coordinates['lon']);
             $entityManager->persist($place);
             $entityManager->flush();
 
