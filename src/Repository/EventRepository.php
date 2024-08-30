@@ -37,7 +37,7 @@ class EventRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findWithMultipleFilters(filtersDTO $filtersDTO): array{
+    public function findWithMultipleFilters(filtersDTO $filtersDTO, $requester): array{
 
         $query = $this->createQueryBuilder('e')
                 ->select('e') // 'COUNT(e.id) as nbParticipant'
@@ -48,20 +48,33 @@ class EventRepository extends ServiceEntityRepository
                 ->leftJoin('e.registered', 'reg_user')
 
                 ->addOrderBy('e.dateTimeStart', 'ASC')
-                ->addOrderBy('e.registrationDeadline', 'ASC')
+                ->addOrderBy('e.registrationDeadline', 'ASC');
 
-                ->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo)')
-                ->setParameter('published', 'published')
-                ->setParameter('otherState', ['canceled','created'])
-                ->setParameter('requesterPseudo', $filtersDTO->userPseudo)
-//                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
-                ->groupBy('e.id, user.id, site.id, reg_user.id');
+
+                //Close spécifique selon admin ou non
+
+                    if(in_array('ROLE_ADMIN', $requester->getRoles())){
+                        //On met pas de préfiltre sur les évènements, on les voient TOUS
+                        $query->groupBy('e.id, user.id, site.id, reg_user.id');
+                    }else{
+                        $query->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo)')
+                        ->setParameter('published', 'published')
+                        ->setParameter('otherState', ['canceled','created'])
+                        ->setParameter('requesterPseudo', $requester->getPseudo())
+        //                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
+                        ->groupBy('e.id, user.id, site.id, reg_user.id');
+                    }
+
 
 
             if($filtersDTO->status != 'all'){
+
+                //Dans ces trois if, on doit rajouter une condition pour que le statut soit 'published'.
                 if($filtersDTO->status == 'Ouverte'){
                     $query->having('COUNT(reg_user.id) < e.maxNbRegistration')
                         ->andWhere('e.registrationDeadline > :currentDate')
+                        ->andWhere('e.state = :published')
+                        ->setParameter('published', 'published')
                         ->setParameter('currentDate', (new \DateTime())->modify('+2 hours'));
                 }
                 if($filtersDTO->status == 'Passée'){
@@ -70,6 +83,8 @@ class EventRepository extends ServiceEntityRepository
 
                     $query->andWhere('e.dateTimeStart < :currentDate')
                         ->andWhere('e.dateTimeStart > :oneMonthAgo')
+                        ->andWhere('e.state = :published')
+                        ->setParameter('published', 'published')
                         ->setParameter('currentDate',$now)
                         ->setParameter('oneMonthAgo',$nowMinusOneMonth);
                 }
@@ -79,8 +94,12 @@ class EventRepository extends ServiceEntityRepository
 
                     $query->andWhere('e.dateTimeStart > :currentDate')
                         ->andWhere('e.registrationDeadline < :currentDate')
+                        ->andWhere('e.state = :published')
+                        ->setParameter('published', 'published')
                         ->setParameter('currentDate',$now);
                 }
+
+                //Dans les deux if suivants on ne rajoute pas la condition sur le statut égal à 'published'
                 if($filtersDTO->status == 'Annulée'){
                     $query->andWhere('e.state = :wantedStatus')
                         ->setParameter('wantedStatus', 'canceled');
@@ -88,6 +107,15 @@ class EventRepository extends ServiceEntityRepository
                 if($filtersDTO->status == 'Créée'){
                     $query->andWhere('e.state = :wantedStatus')
                         ->setParameter('wantedStatus', 'created');
+                }
+                if($filtersDTO->status == 'Archivée'){
+                    $now = (new \DateTime())->modify('+2 hours');
+                    $nowMinusOneMonth = (clone $now)->modify('-1 month');
+
+                    $query->andWhere('e.dateTimeStart < :oneMonthAgo')
+                        ->andWhere('e.state = :published')
+                        ->setParameter('published', 'published')
+                        ->setParameter('oneMonthAgo',$nowMinusOneMonth);
                 }
                 //Fonctionne pas ... limité pour faires des opérations entre champs de l'entité (dateStart + duration ...)
 //                if($filtersDTO->status == 'En_cours'){
@@ -118,7 +146,7 @@ class EventRepository extends ServiceEntityRepository
             }
             if($filtersDTO->isPlanner){
                 $query->andWhere('user.pseudo = :plannerPseudo')
-                ->setParameter('plannerPseudo', $filtersDTO->userPseudo);
+                ->setParameter('plannerPseudo', $requester->getPseudo());
             }
             if($filtersDTO->registered){
                 if($filtersDTO->registered === 'registeredOk'){
@@ -133,7 +161,7 @@ class EventRepository extends ServiceEntityRepository
 
                     $query->andWhere(
                         $query->expr()->exists($subQuery)
-                    )->setParameter('regUserPseudo', $filtersDTO->userPseudo);
+                    )->setParameter('regUserPseudo', $requester->getPseudo());
 
 //                    $query->andWhere('reg_user.pseudo = :regUserPseudo')
 //                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
@@ -153,7 +181,7 @@ class EventRepository extends ServiceEntityRepository
                             $query->expr()->exists($subQuery)
                         )
                     )
-                        ->setParameter('regUserPseudo', $filtersDTO->userPseudo);
+                        ->setParameter('regUserPseudo', $requester->getPseudo());
                 }
             }
             return $query->getQuery()->getResult();
