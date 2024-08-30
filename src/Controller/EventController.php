@@ -73,6 +73,8 @@ class EventController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
     {
         $event = new Event();
+        $event->setPlanner($this->getUser());
+        $event->setState('created');
         /*$savedData = $session->get('event_form_data');
 
         if ($savedData) {

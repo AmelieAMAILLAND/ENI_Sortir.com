@@ -34,6 +34,8 @@ class PlaceController extends AbstractController
         }
 
         $place = new Place();
+        $place->setLatitude(0);
+        $place->setLongitude(0);
         $form = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
@@ -122,4 +124,5 @@ class PlaceController extends AbstractController
 
         return $this->redirectToRoute('app_place_index', [], Response::HTTP_SEE_OTHER);
     }
+
 }
