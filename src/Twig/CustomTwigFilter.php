@@ -22,6 +22,15 @@ class CustomTwigFilter extends AbstractExtension
             case 'created':
                 $tailwindClass =  'border border-slate-50 bg-blue-200';
                 break;
+            case 'full':
+                $tailwindClass =  'border border-black-300 bg-stone-300';
+                break;
+            case 'closed':
+                $tailwindClass =  'border border-red-300 bg-red-200';
+                break;
+            case 'archived':
+                $tailwindClass =  'bg-gray-200 opacity-70';
+                break;
             case 'in_progress':
                 $tailwindClass =  'border border-green-500 bg-amber-50';
                 break;
@@ -29,7 +38,7 @@ class CustomTwigFilter extends AbstractExtension
                 $tailwindClass =  'border border-slate-500 bg-gray-100';
                 break;
             case 'published':
-                $tailwindClass =  'border border-slate-50 bg-amber-50';
+                $tailwindClass =  'border border-slate-50 bg-green-200';
                 break;
         }
         return $tailwindClass;

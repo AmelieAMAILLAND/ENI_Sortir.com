@@ -40,7 +40,7 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
 
-        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null,$user->getPseudo());
+        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null);
 
         $filters = $request->query->all();
         if($filters) {
@@ -51,13 +51,17 @@ class EventController extends AbstractController
             }
         }
 
-        $events = $eventRepository->findWithMultipleFilters($filtersDTO);
+        $events = $eventRepository->findWithMultipleFilters($filtersDTO, $user);
 
-        //Parmis tous les évènements récupérés, on les gardes tous sauf ceux pas encore publiés et dont on n'est pas l'organisateur.
-        //Donc on garde ceux qui sont en 'createdé et dont on est l'organisateur ET ceux qui sont pas en 'created'.
-//        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'created')) || ($event->getState() != 'created'));
+        //Faire un dernier filtre (qui garde seulement les évènements dont le statut n'est pas 'archived') OU ceux avec 'archived' MAIS dont on est l'organisateur
+        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'archived')) || ($event->getState() != 'archived'));
 
-        $statusArray = ['Ouverte', 'Passée', 'Fermée', 'Créée', 'Annulée'];
+
+        //Comme filtre Twig personnalisé ne fonctionne pas. On créer un tableau
+
+
+
+        $statusArray = ['Ouverte', 'Complète', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
 
         $sites = $siteRepository->findAll();
         

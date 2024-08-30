@@ -63,10 +63,11 @@
                             <input type="radio" name="registered" value="notRegistered" id="notRegistered" {{ filters.registered == "notRegistered" ? 'checked' : '' }}>
                         </div>
                     </div>
-                    <input type="hidden" value="{{ app.user.pseudo }}" name="userPseudo">
                 </div>
             </div>
-
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                <p class="hidden" id="isAdmin">admin</p>
+            {% endif %}
             <div class="btns-container min-w-[30%] flex flex-col items-center justify-center gap-4">
                 <button type="submit" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
                 <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-slate-600 text-white hover:opacity-80 shadow-md">Réinitialiser</button>
@@ -78,7 +79,7 @@
     <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
 
         {% for event in events %}
-            <div class="event-card {{ event.state | mapStatusForTailwind}} max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md ">
+            <div class="event-card {{ event.state | mapStatusForTailwind}} max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform">
                 <div class="name-and-date-container flex justify-between items-end">
                     <p class="font-semibold text-xl hover:opacity-80">
                         <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>
@@ -91,10 +92,14 @@
                         <p> {{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y - H:i') : '' }}</p>
                     </div>
 
-                    {% if app.user in event.registered %}
-                        <img src="{{ asset('images/registered.svg') }}" alt="icone correcte" class="w-10">
+                    {% if (app.user.pseudo == event.planner.pseudo) %}
+                        <p class="text-blue-500 font-semibold">Organisateur</p>
                     {% else %}
-                        <img src="{{ asset('images/notRegistered.svg') }}" alt="icone fausse" class="w-10">
+                        {% if (app.user in event.registered) %}
+                            <p class="text-green-500 font-semibold">Inscrit</p>
+                        {% else %}
+                                <p class="text-red-500 font-semibold">Non inscrit</p>
+                        {% endif %}
                     {% endif %}
 
                 </div>
@@ -107,7 +112,7 @@
                 <div class="org-container flex justify-between">
 
                     <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
-                    <p class="">{{ event.state | upper }}</p>
+                    <p class="">{{ event.state | mapStatusToFrench }}</p>
 
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
@@ -116,6 +121,8 @@
                         <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
                     {% endif %}
                 </div>
+
+
             </div>
 
         {% else %}
@@ -126,6 +133,7 @@
 
 
     </div>
+
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
@@ -156,11 +164,20 @@
         const stateInput = document.getElementById('status');
         const plannerCheckbox = document.getElementById('isPlanner');
 
+        const isAdmin = !!document.getElementById('isAdmin');
+
 
         stateInput.addEventListener('change', checkForPlannerCheckbox)
 
         function checkForPlannerCheckbox(e){
-            if(stateInput.value === "Annulée" || stateInput.value === "Créée"){
+
+            //Si l'utilisateur qui clique est admin, on ne coche/disable pas la checkbox.
+            if(isAdmin){
+                return;
+            }
+
+
+            if(stateInput.value === "Annulée" || stateInput.value === "Créée" || stateInput.value === "Archivée"){
                 plannerCheckbox.checked = true;
                 plannerCheckbox.disabled = true;
             }else{

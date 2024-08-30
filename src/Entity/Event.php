@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Listeners\EventListener;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,6 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\EntityListeners([EventListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity('name')]
 class Event
