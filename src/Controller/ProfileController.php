@@ -7,6 +7,7 @@ use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,6 +75,8 @@ class ProfileController extends AbstractController
                 }
             }
 
+            $oldPicture = $user->getProfilePicture();
+
             if ($request->get('remove_picture')) {
                 $user->setProfilePicture(null);
             }
@@ -88,6 +91,12 @@ class ProfileController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+
+            if ($oldPicture && ($oldPicture !== $user->getProfilePicture())) {
+                $filesystem = new Filesystem();
+                $filesystem->remove($this->getParameter('uploads_directory').'/'.$oldPicture);
+            }
 
             return $this->redirectToRoute('app_profil');
         }
