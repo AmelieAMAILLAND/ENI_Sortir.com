@@ -31,7 +31,7 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
 
-        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null,null);
+        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null,$user->getPseudo());
 
         $filters = $request->query->all();
         if($filters) {
@@ -46,9 +46,9 @@ class EventController extends AbstractController
 
         //Parmis tous les évènements récupérés, on les gardes tous sauf ceux pas encore publiés et dont on n'est pas l'organisateur.
         //Donc on garde ceux qui sont en 'createdé et dont on est l'organisateur ET ceux qui sont pas en 'created'.
-        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'created')) || ($event->getState() != 'created'));
+//        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'created')) || ($event->getState() != 'created'));
 
-        $statusArray = ['Ouverte', 'Passée', 'Fermée'];
+        $statusArray = ['Ouverte', 'Passée', 'Fermée', 'Créée', 'Annulée'];
 
         $sites = $siteRepository->findAll();
         
