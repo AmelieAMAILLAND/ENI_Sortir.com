@@ -6,6 +6,8 @@ use App\Repository\PlaceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: PlaceRepository::class)]
 class Place
@@ -15,22 +17,33 @@ class Place
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, unique: true)]
+    #[Assert\NotBlank(message: 'Le nom de lieu est obligatoire.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le nom ne doit pas faire plus de {{ limit }} caractères.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le nom de rue est obligatoire.')]
+    #[Assert\Length(max: 50, maxMessage: 'La rue ne doit pas faire plus de {{ limit }} caractères.')]
     private ?string $street = null;
 
     #[ORM\Column(length: 5)]
+    #[Assert\Regex(pattern: "/^\d{5}$/", message: "Vérifiez le code postal.")]
     private ?string $zipCode = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le nom de ville est obligatoire.')]
+    #[Assert\Length(max: 50, maxMessage: 'La ville ne doit pas faire plus de {{ limit }} caractères.')]
     private ?string $city = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La latitude est obligatoire.')]
+    #[Assert\Range(min: -90, max: 90, notInRangeMessage: 'La latitude doit être compris entre {{ min }} et {{ max }}.')]
     private ?float $latitude = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La longitude est obligatoire.')]
+    #[Assert\Range(min: -180, max: 180, notInRangeMessage: 'La longitude doit être compris entre {{ min }} et {{ max }}.')]
     private ?float $longitude = null;
 
     /**
