@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\DTO\filtersDTO;
 use App\Entity\Event;
+use App\Entity\User;
 use App\Form\AnnulationType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\PlaceRepository;
 use App\Repository\SiteRepository;
+use App\Service\EmailService;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,10 +20,17 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Psr\Log\LoggerInterface;
 
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
     #[Route('/', name: '_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository,
                           SiteRepository $siteRepository,
@@ -188,21 +197,28 @@ class EventController extends AbstractController
     // src/Controller/EventController.php     
 
     #[Route('/{id}/cancel', name: '_cancel', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function cancel(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
+    public function cancel(Request $request, Event $event, EntityManagerInterface $entityManager, EmailService $emailService): Response
     {
-         // Vérifier si l'utilisateur a les droits nécessaires
-        if ($event->getPlanner() !== $this->getUser()) {
-            $this->addFlash('danger', 'Vous ne pouvez pas annuler cet évènement car vous n\'en êtes pas l\'organisateur.');
-            return $this->redirectToRoute('app_event_index');
-        }
-
         $form = $this->createForm(AnnulationType::class, $event);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $event->setState('canceled');
+            $reason = $form->get('annulation')->getData();
             $entityManager->flush();
+
+            // Forcer le chargement des utilisateurs inscrits
+            $registeredUsers = $event->getRegistered()->toArray();
+
+            // Envoyer des emails aux personnes inscrites
+            foreach ($registeredUsers as $user) {
+                if ($user instanceof User) {
+                    $email = $user->getEmail();
+                    if ($email) {
+                        $emailService->sendCancellationEmail($email, $event->getName(), $reason);
+                    }
+                }
+            }
 
             return $this->redirectToRoute('app_event_index');
         }
@@ -212,6 +228,12 @@ class EventController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
+
+
+
+
 
 
 
