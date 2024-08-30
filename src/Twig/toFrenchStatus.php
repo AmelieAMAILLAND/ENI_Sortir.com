@@ -32,7 +32,7 @@ class toFrenchStatus extends AbstractExtension
                 $frenchStatus =  'Ouverte';
                 break;
             case 'full':
-                $frenchStatus =  'Complet';
+                $frenchStatus =  'Complète';
                 break;
             case 'archived':
                 $frenchStatus =  'Archivée';

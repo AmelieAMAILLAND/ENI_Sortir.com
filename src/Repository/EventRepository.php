@@ -77,6 +77,13 @@ class EventRepository extends ServiceEntityRepository
                         ->setParameter('published', 'published')
                         ->setParameter('currentDate', (new \DateTime())->modify('+2 hours'));
                 }
+                if($filtersDTO->status == 'Complète'){
+                    $query->having('COUNT(reg_user.id) = e.maxNbRegistration')
+                        ->andWhere('e.registrationDeadline > :currentDate')
+                        ->andWhere('e.state = :published')
+                        ->setParameter('published', 'published')
+                        ->setParameter('currentDate', (new \DateTime())->modify('+2 hours'));
+                }
                 if($filtersDTO->status == 'Passée'){
                     $now = (new \DateTime())->modify('+2 hours'); //Fuseau horaire relou ...
                     $nowMinusOneMonth = (clone $now)->modify('-1 month');

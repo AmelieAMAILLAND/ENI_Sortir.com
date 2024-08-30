@@ -52,7 +52,7 @@ class EventController extends AbstractController
 
 
 
-        $statusArray = ['Ouverte', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
+        $statusArray = ['Ouverte', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée', 'Complète'];
 
         $sites = $siteRepository->findAll();
         
