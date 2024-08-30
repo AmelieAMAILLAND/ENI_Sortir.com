@@ -112,7 +112,7 @@
                 <div class="org-container flex justify-between">
 
                     <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
-                    <p class="">{{ event.state | upper }}</p>
+                    <p class="">{{ event.state | mapStatusToFrench }}</p>
 
                 </div>
                 <div class="actions-container mx-auto max-w-fit mt-2">
