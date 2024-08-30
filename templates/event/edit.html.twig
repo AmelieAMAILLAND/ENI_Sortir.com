@@ -21,7 +21,11 @@
             <div class="flex-row">
                 {{ form_row(form.place) }}
                 <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">+</a>
-                <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">&#x270e;</a>
+                {% if event.place %}
+                    <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">&#x270e;</a>
+                {% else %}
+                    <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">&#x270e;</a>
+                {% endif %}
             </div>
             <div>
                 {% if event.state=='created' %}

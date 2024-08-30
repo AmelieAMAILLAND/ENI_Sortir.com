@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Site;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -21,6 +22,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message:'Email obligatoire.')]
+    #[Assert\Email(message:'Format d\'email non valide.')]
     private ?string $email = null;
 
     /**
@@ -33,19 +36,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message:'Mot de passe obligatoire.')]
     private ?string $password = null;
 
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: true)]
+    #[Assert\NotBlank(message:'Le pseudo est obligatoire')]
+    #[Assert\Length(max: 100, maxMessage: "Votre pseudo est trop long.")]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 100, maxMessage: "Votre prénom est trop long.")]
     private ?string $first_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 100, maxMessage: "Votre nom est trop long.")]
     private ?string $last_name = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Regex(pattern:"/^(\+33|0)[1-9](\d{2}){4}$/", message:"Vérifiez votre numéro de téléphone")]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -59,6 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToOne(targetEntity: Site::class, inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Site $site = null;
 
     /**

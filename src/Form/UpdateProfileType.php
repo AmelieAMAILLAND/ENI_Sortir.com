@@ -19,39 +19,40 @@ class UpdateProfileType extends AbstractType
     {
         $builder
             ->add('pseudo', TextType::class, [
-                'label' => 'Pseudo :',
+                'label' => 'Pseudo ',
             ])
             ->add('first_name', TextType::class, [
-                'label' => 'Prénom :',
+                'label' => 'Prénom ',
             ])
             ->add('last_name', TextType::class, [
-                'label' => 'Nom :',
+                'label' => 'Nom ',
             ])
             ->add('phone', TextType::class, [
-                'label' => 'Téléphone :',
+                'label' => 'Téléphone ',
             ])
             ->add('email', EmailType::class, [
-                'label' => 'email :',
+                'label' => 'email ',
             ])
             ->add('password', PasswordType::class, [
                 'mapped' => false,
                 'required' => false,
-                'label' => 'Nouveau mot de passe :',
+                'label' => 'Nouveau mot de passe ',
                 'empty_data' => '',
             ])
             ->add('password_confirmation', PasswordType::class, [
                 'mapped' => false,
                 'required' => false,
-                'label' => 'Confirmez le mot de passe'
+                'label' => 'Confirmez le mot de passe '
             ])
             ->add('site', EntityType::class, [
-                'label' => 'Site de rattachement :',
+                'label' => 'Site de rattachement ',
                 'class' => Site::class,
                 'placeholder' => 'Choisissez un site',
                 'required' => true,
             ])
 
             ->add('profilePicture', FileType::class, [
+                'label' => 'photo de profil ',
                 'required' => false,
                 'mapped' => false,
             ])
