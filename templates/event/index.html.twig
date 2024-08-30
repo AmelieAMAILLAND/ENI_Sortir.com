@@ -148,7 +148,30 @@
             dateInputs.forEach(dateInput => dateInput.value = "");
             checkboxes.forEach(checkbox=>checkbox.checked = false);
             defaultRadioBtn.checked = true;
+
+            if(plannerCheckbox.disabled) plannerCheckbox.disabled = false;
         }
+
+
+        const stateInput = document.getElementById('status');
+        const plannerCheckbox = document.getElementById('isPlanner');
+
+
+        stateInput.addEventListener('change', checkForPlannerCheckbox)
+
+        function checkForPlannerCheckbox(e){
+            if(stateInput.value === "Annulée" || stateInput.value === "Créée"){
+                plannerCheckbox.checked = true;
+                plannerCheckbox.disabled = true;
+            }else{
+                plannerCheckbox.disabled = false;
+            }
+        }
+
+        //Au chargement de la page, donc du script on vérifie aussi l'état.
+        checkForPlannerCheckbox();
+
+        console.log(stateInput, plannerCheckbox)
 
     </script>
 {% endblock %}

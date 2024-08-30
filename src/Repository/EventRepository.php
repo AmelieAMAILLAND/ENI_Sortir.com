@@ -49,8 +49,12 @@ class EventRepository extends ServiceEntityRepository
 
                 ->addOrderBy('e.dateTimeStart', 'ASC')
                 ->addOrderBy('e.registrationDeadline', 'ASC')
-                ->where('e.state IN (:states)')
-                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
+
+                ->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo)')
+                ->setParameter('published', 'published')
+                ->setParameter('otherState', ['canceled','created'])
+                ->setParameter('requesterPseudo', $filtersDTO->userPseudo)
+//                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
                 ->groupBy('e.id, user.id, site.id, reg_user.id');
 
 
@@ -76,6 +80,14 @@ class EventRepository extends ServiceEntityRepository
                     $query->andWhere('e.dateTimeStart > :currentDate')
                         ->andWhere('e.registrationDeadline < :currentDate')
                         ->setParameter('currentDate',$now);
+                }
+                if($filtersDTO->status == 'Annulée'){
+                    $query->andWhere('e.state = :wantedStatus')
+                        ->setParameter('wantedStatus', 'canceled');
+                }
+                if($filtersDTO->status == 'Créée'){
+                    $query->andWhere('e.state = :wantedStatus')
+                        ->setParameter('wantedStatus', 'created');
                 }
                 //Fonctionne pas ... limité pour faires des opérations entre champs de l'entité (dateStart + duration ...)
 //                if($filtersDTO->status == 'En_cours'){
