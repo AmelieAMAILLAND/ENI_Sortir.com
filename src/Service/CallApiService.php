@@ -13,15 +13,17 @@ class CallApiService
         $this->client = $client;
     }
 
-    public function getCoordinates(string $adress): array
+    public function getCoordinates(string $adress): ?array
     {
         $response = $this->client->request(
             'GET',
             "https://nominatim.openstreetmap.org/search?q=$adress&addressdetails=1&format=json"
         );
         $element = json_decode($response->getContent(), true);
+        if (!$element){
+            return null;
+        }
         return ['lat'=>$element[0]['lat'],'lon'=>$element[0]['lon']];
-//        return $response->toArray();
     }
 
 

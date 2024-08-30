@@ -40,6 +40,13 @@ class PlaceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $adress=str_replace(' ','+',trim($place->getStreet())).'+'.str_replace(' ','+',trim($place->getCity()));
             $coordinates = $apiService->getCoordinates($adress);
+            if (!$coordinates){
+                $this->addFlash('danger', 'Adresse inconnue. Veuillez vérifier l\'orthographe et l\'ensemble des champs ou trouver un lieu proche.');
+                return $this->render('place/edit.html.twig', [
+                    'place' => $place,
+                    'form' => $form,
+                ]);
+            }
             $place->setLatitude($coordinates['lat']);
             $place->setLongitude($coordinates['lon']);
             $entityManager->persist($place);
@@ -67,7 +74,7 @@ class PlaceController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_place_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Place $place, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function edit(Request $request, Place $place, EntityManagerInterface $entityManager, SessionInterface $session, CallApiService $apiService): Response
     {
         $currentUrl = $request->getUri();
         $referer = $request->headers->get('referer');
@@ -79,6 +86,17 @@ class PlaceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $adress=str_replace(' ','+',trim($place->getStreet())).'+'.str_replace(' ','+',trim($place->getCity()));
+            $coordinates = $apiService->getCoordinates($adress);
+            if (!$coordinates){
+                $this->addFlash('danger', 'Adresse inconnue. Veuillez vérifier l\'orthographe et l\'ensemble des champs ou trouver un lieu proche.');
+                return $this->render('place/edit.html.twig', [
+                    'place' => $place,
+                    'form' => $form,
+                ]);
+            }
+            $place->setLatitude($coordinates['lat']);
+            $place->setLongitude($coordinates['lon']);
             $entityManager->flush();
 
             $newPlaceId = $place->getId();
