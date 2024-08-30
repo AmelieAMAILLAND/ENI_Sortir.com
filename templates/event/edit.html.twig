@@ -32,6 +32,14 @@
                     {{ form_row(form.submit) }}
                     {{ form_row(form.publish) }}
                 {% endif %}
+
+                {% if event.state=='published' or event.state=='closed' or event.state=='in_progress' or event.state=='full' %}
+                    {{ form_row(form.submit) }}
+                {% endif %}
+
+                {% do form.submit.setRendered %} {# pour que le rest_form ne cherche pas à les rendre #}
+                {% do form.publish.setRendered %}
+
                 {{ form_rest(form) }} {# pour passer le token #}
 
 

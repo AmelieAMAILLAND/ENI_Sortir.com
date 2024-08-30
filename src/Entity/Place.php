@@ -39,11 +39,13 @@ class Place
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La latitude est obligatoire.')]
     #[Assert\Range(min: -90, max: 90, notInRangeMessage: 'La latitude doit être compris entre {{ min }} et {{ max }}.')]
+    #[Assert\Type(type: 'number', message: 'la latitude doit être un nombre')]
     private ?float $latitude = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La longitude est obligatoire.')]
     #[Assert\Range(min: -180, max: 180, notInRangeMessage: 'La longitude doit être compris entre {{ min }} et {{ max }}.')]
+    #[Assert\Type(type: 'number', message: 'la longitude doit être un nombre')]
     private ?float $longitude = null;
 
     /**
