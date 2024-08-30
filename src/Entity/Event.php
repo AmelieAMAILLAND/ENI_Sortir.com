@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -20,29 +21,36 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 30, unique: true)]
-
+    #[Assert\NotBlank(message: "Nom de la sortie obligatoire")]
+    #[Assert\Length(min: 4, max: 30, minMessage: "Il faut au moins {{ limit }} caractères", maxMessage: "Pas plus de {{ limit }} caractères")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThan('today', message:'La sortie doit avoir lieu après l\'instant présent.')]
     private ?\DateTimeInterface $dateTimeStart = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $duration = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\LessThan(propertyPath: 'dateTimeStart', message: 'On ne doit pas pouvoir s\'inscrire après le début de la sortie.')]
     private ?\DateTimeInterface $registrationDeadline = null;
 
     #[ORM\Column]
+    #[Assert\Positive(message: 'Un nombre de participants négatif, vraiment ?')]
+    #[Assert\LessThan(1000000, message: 'Il n\'y aura pas assez de place !')]
     private ?int $maxNbRegistration = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $infoEvent = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: 'Vous n\'avez pas renseigné d\'état')]
     private ?string $state = null;
 
     #[ORM\ManyToOne(inversedBy: 'plannedEvents')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'Il faut un organisateur')]
     private ?User $planner = null;
 
     /**
@@ -57,6 +65,7 @@ class Event
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'event')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'Il faut un lieu')]
     private ?Place $place = null;
 
 
