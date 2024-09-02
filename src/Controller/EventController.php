@@ -75,12 +75,8 @@ class EventController extends AbstractController
         $event = new Event();
         $event->setPlanner($this->getUser());
         $event->setState('created');
-        /*$savedData = $session->get('event_form_data');
 
-        if ($savedData) {
-            $event = $savedData;
-            $session->remove('event_form_data');
-        }*/
+        $places = $placeRepository->findAll();
 
         $newPlaceId = $request->query->get('newPlaceId');
         if ($newPlaceId) {
@@ -106,6 +102,7 @@ class EventController extends AbstractController
         }
         return $this->render('event/edit.html.twig', [
             'event' => $event,
+            'places' => $places,
             'form' => $form,
         ]);
     }
@@ -140,6 +137,9 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_event_index');
         }
         $owner = $event->getPlanner();
+
+        $places = $placeRepository->findAll();
+
         if ($owner === $this->getUser() && ($event->getState() === 'created' || $event->getState() === 'published')) {
             $newPlaceId = $request->query->get('newPlaceId');
             if ($newPlaceId) {
@@ -165,6 +165,7 @@ class EventController extends AbstractController
 
             return $this->render('event/edit.html.twig', [
                 'event' => $event,
+                'places' => $places,
                 'form' => $form,
             ]);
         } elseif ($owner !== $this->getUser()) {

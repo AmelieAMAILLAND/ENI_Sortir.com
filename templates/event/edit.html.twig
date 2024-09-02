@@ -3,6 +3,15 @@
 {% block title %}Edit Event{% endblock %}
 
 {% block body %}
+    <aside id="modal" class="modal-container fixed top-0 left-0 w-screen h-screen bg-gray-500/75 hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="title-modal">
+        <div class="overlay absolute w-full h-full bg-gray-500/75 close-modal"></div>
+        <div class="modal w-11/12 max-w-2xl min-w-80 p-7 bg-white rounded absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <button class="close-modal modal-trigger px-2 py-1 rounded text-lg absolute top-2.5 right-2.5 bg-red-600 text-white">X</button>
+            <h1 id="title-modal" class="mb-2.5 text-2xl font-medium">Choisissez un lieu pour votre activité</h1>
+            <div id="map"></div>
+        </div>
+
+    </aside>
     <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex flex-col">
         <h1 class="mb-3 font-semibold text-center">{% if app.current_route=='app_event_new' %}Créer{% else %}Modifier{% endif %} une sortie </h1>
 
@@ -26,6 +35,8 @@
                 {% else %}
                     <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">&#x270e;</a>
                 {% endif %}
+                <a href="#modal" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto modal-btn js-modal hover:opacity-80">Choisir</a>
+{#                <button class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto modal-btn modal-trigger hover:opacity-80">Choisir</button>#}
             </div>
             <div>
                 {% if event.state=='created' %}
@@ -46,4 +57,5 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('JavaScript/eventEdit.js') }}"></script>
+    <script src="{{ asset('JavaScript/eventModal.js') }}"></script>
 {% endblock %}
