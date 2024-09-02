@@ -1,12 +1,13 @@
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener("DOMContentLoaded", (e) => {
+    // OUverture et fermeture de la modale
     let modal =null;
     const toggleModal = ()=>{
         modalContainer.classList.toggle("hidden");
         modalContainer.classList.toggle("block");
     }
 
-    const openModal = (event) =>{
-        event.preventDefault();
+    const openModal = (e) =>{
+        e.preventDefault();
         const target = document.querySelector('.modal-container');
         target.classList.remove('hidden');
         target.removeAttribute('aria-hidden');
@@ -18,9 +19,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         modal = target;
     }
 
-    const closeModal = (event) =>{
+    const closeModal = (e) =>{
         if (modal) {
-            event.preventDefault();
+            e.preventDefault();
             const target = document.querySelector('.modal-container');
             target.classList.add('hidden');
             target.setAttribute('aria-hidden', true);
@@ -38,8 +39,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
     })
 
 
+    // Affichage de la carte
     let lat = 47.226586171358186;
     let lon = -1.6207834394808776;
+    let currentPlaceName = document.getElementById('place-name').value;
 
     let map = L.map("map",{
         zoom: 10,
@@ -55,16 +58,23 @@ document.addEventListener("DOMContentLoaded", (event) => {
     places.forEach((place) => {
         lat = place.latitude;
         lon = place.longitude;
+        if (currentPlaceName===place.name){
+            map.setView([lat,lon]);
+        }
         let marker = L.marker([lat,lon]).addTo(map);
+        const choseBtn = document.createElement('button')
         let popup = `<div>
-                            <div>
-                                <h2>${place.name}</h2>
-                                <p>${place.street}</p>
-                                <p>${place.zipCode}</p>
-                                <p>${place.city}</p>
-                                <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-popup-btn">&#x270e;</a> <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">&#x2611;</a></p>
-                            </div>
-                        </div>`;
+                                <div>
+                                    <h2 class="text-lg text-center">${place.name}</h2>
+                                    <p>${place.street}</p>
+                                    <p>${place.zipCode} ${place.city}</p>
+                                    <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-popup-btn">Modifier</a> <button id="chose-place" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Sélectionner</button></p>
+                                </div>
+                            </div>`;
+        // document.getElementById("chose-place").addEventListener('click',(e)=>{
+        //     e.preventDefault();
+        //     currentPlaceName.value=place.name;
+        // })
 
         marker.bindPopup(popup);
     })

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", (event) => {
     // changement du lien d'édition du lieu en fonction du lieu sélectionné dans le select
     const editLink = document.getElementById('place-edit');
-    document.getElementById('event_place').addEventListener('change', function(){
+    document.getElementById('place-name').addEventListener('change', function(){
         const value = this.value;
         editLink.href=`/place/${value}/edit`;
     })
