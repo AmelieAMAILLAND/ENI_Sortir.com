@@ -54,7 +54,7 @@ class EventRepository extends ServiceEntityRepository
                 //Close spécifique selon admin ou non
 
                     if(in_array('ROLE_ADMIN', $requester->getRoles())){
-                        //On met pas de préfiltre sur les évènements, on les voient TOUS
+                        //On met pas de préfiltre sur les évènements, on les voit TOUS
                         $query->groupBy('e.id, user.id, site.id, reg_user.id');
                     }else{
                         $query->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo)')
@@ -126,7 +126,7 @@ class EventRepository extends ServiceEntityRepository
                 }
                 //Fonctionne pas ... limité pour faires des opérations entre champs de l'entité (dateStart + duration ...)
 //                if($filtersDTO->status == 'En_cours'){
-//                    $now = (new \DateTime())->modify('+2 hours');
+//                    $now = (new \DateTime())->modify('+2 hours'); 
 //
 //                    // Ajouter une expression native SQL pour calculer la date de fin
 //                    $query->andWhere('e.dateTimeStart <= :currentDate')
