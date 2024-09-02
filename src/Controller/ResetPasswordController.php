@@ -77,15 +77,11 @@ class ResetPasswordController extends AbstractController
     public function reset(Request $request, UserPasswordHasherInterface $passwordHasher, TranslatorInterface $translator, ?string $token = null): Response
     {
         if ($token) {
-            // We store the token in session and remove it from the URL, to avoid the URL being
-            // loaded in a browser and potentially leaking the token to 3rd party JavaScript.
             $this->storeTokenInSession($token);
-
             return $this->redirectToRoute('app_reset_password');
         }
 
         $token = $this->getTokenFromSession();
-
         if (null === $token) {
             throw $this->createNotFoundException('No reset password token found in the URL or in the session.');
         }
@@ -103,27 +99,34 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_forgot_password_request');
         }
 
-        // The token is valid; allow the user to change their password.
         $form = $this->createForm(ChangePasswordFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // A password reset token should be used only once, remove it.
-            $this->resetPasswordHelper->removeResetRequest($token);
+            $plainPassword = $form->get('plainPassword')->getData();
+            $confirmPassword = $form->get('confirmPassword')->getData();
 
-            // Encode(hash) the plain password, and set it.
+            // Vérifiez si les mots de passe correspondent
+            if ($plainPassword !== $confirmPassword) {
+                $this->addFlash('reset_password_error', 'Les mots de passe ne correspondent pas.');
+                return $this->render('reset_password/reset.html.twig', [
+                    'resetForm' => $form,
+                ]);
+            }
+
+            // Utilisez le hasher de mots de passe pour encoder le mot de passe
             $encodedPassword = $passwordHasher->hashPassword(
                 $user,
-                $form->get('plainPassword')->getData()
+                $plainPassword
             );
 
             $user->setPassword($encodedPassword);
+            $this->resetPasswordHelper->removeResetRequest($token);
             $this->entityManager->flush();
 
-            // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
 
-            return $this->redirectToRoute('/login');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('reset_password/reset.html.twig', [
