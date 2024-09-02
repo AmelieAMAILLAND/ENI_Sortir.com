@@ -72,6 +72,8 @@ class EventController extends AbstractController
         ]);
     }
 
+
+
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
     {

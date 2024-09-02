@@ -52,11 +52,11 @@ class EventListener
         if($now < $dateEndEvent && $now > $event->getDateTimeStart()){
             $event->setState('in_progress');
         }
-        if($now < $event->getDateTimeStart() && $now > $event->getRegistrationDeadline()){ // GOOD
-            $event->setState('closed');
-        }
         if(count($event->getRegistered()) >= $event->getMaxNbRegistration()){ // GOOD
             $event->setState('full');
+        }
+        if($now < $event->getDateTimeStart() && $now > $event->getRegistrationDeadline()){ // GOOD
+            $event->setState('closed');
         }
 
     }
