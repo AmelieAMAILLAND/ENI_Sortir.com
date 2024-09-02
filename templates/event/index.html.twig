@@ -5,6 +5,10 @@
 {% block body %}
     <h1 class="text-center text-3xl font-semibold my-3">Les sorties</h1>
 
+    <div class="vue-btn-container">
+        <button id="switch-vue-btn" class="py-1 px-2 rounded-md w-[120px] bg-red-200 fixed top-[120px] right-[20px]">Vue tableau</button>
+    </div>
+
     <div class="form-container mb-6 border border-slate-500 py-4 px-6 max-w-[1200px] mx-auto shadow-md rounded-md">
         <form method="GET" class="flex justify-between">
             <div class="filters-container flex flex-col gap-2 min-w-[50%]">
@@ -45,8 +49,11 @@
 {#                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>#}
 {#                        </div>#}
                         <div class="planner-container">
-                            <label for="isPlanner">Dont je suis organisateur</label>
-                            <input type="checkbox" id="isPlanner" name="isPlanner" {{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input">
+                            <label class="flex justify-between items-center gap-2">
+                                Dont je suis organisateur
+                            <input type="checkbox" name="isPlanner" id="isPlanner"{{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input peer hidden bg-transparent">
+                            <span class="bg-gray-300 w-11 h-7 rounded-full flex flex-shrink-0 items-center after:bg-white after:w-5 after:h-5 after:rounded-full p-1 peer-checked:bg-green-500 peer-disabled:bg-red-500 peer-checked:after:translate-x-4 ease-in-out duration-400 after:duration-300"></span>
+                            </label>
                         </div>
                     </div>
                     <div class="registered-container flex justify-between ">
@@ -65,6 +72,7 @@
                     </div>
                 </div>
             </div>
+
             {% if 'ROLE_ADMIN' in app.user.roles %}
                 <p class="hidden" id="isAdmin">admin</p>
             {% endif %}
@@ -76,8 +84,7 @@
         </form>
     </div>
     
-    <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
-
+    <div class="card-container grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
         {% for event in events %}
             <div class="event-card {{ event.state | mapStatusForTailwind}} max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform">
                 <div class="name-and-date-container flex justify-between items-end">
@@ -134,6 +141,65 @@
 
     </div>
 
+    <div class="table-container max-w-[1200px] mx-auto hidden">
+        <table class="table w-full">
+            <thead>
+            <tr class="border border-slate-900 bg-slate-900">
+                <th class="th-style">Nom</th>
+                <th class="th-style">Date de début</th>
+                <th class="th-style">Durée</th>
+                <th class="th-style">Clôture</th>
+                <th class="th-style">Inscrits/Places</th>
+                <th class="th-style">Inscrit</th>
+                <th class="th-style">État</th>
+                <th class="th-style">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for event in events %}
+
+                {% if loop.index is even %}
+                    <tr class="hover:opacity-80 border border-slate-500 bg-slate-200">
+                {% else %}
+                    <tr class="hover:opacity-80 border border-slate-500">
+                {% endif %}
+
+                    <td class="td-style">{{ event.name }}</td>
+                    <td class="td-style">
+                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-table-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">
+                    </td>
+{#                    <td class="td-style">{{ event.dateTimeStart ? event.dateTimeStart|date('d/m/Y H:i') : '' }}</td>#}
+                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>
+                    <td class="td-style">
+                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-table-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">
+                    </td>
+                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>
+                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}
+                            <p class="text-blue-500 font-semibold">Organisateur</p>
+                        {% else %}
+                            {% if (app.user in event.registered) %}
+                                <p class="text-green-500 font-semibold">Inscrit</p>
+                            {% else %}
+                                <p class="text-red-500 font-semibold">Non inscrit</p>
+                            {% endif %}
+                        {% endif %}</td>
+                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>
+                    <td class="h-[50px] flex justify-center items-center gap-1">
+                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
+                        {% if event.planner.pseudo == app.user.pseudo %}
+                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
@@ -170,13 +236,11 @@
         stateInput.addEventListener('change', checkForPlannerCheckbox)
 
         function checkForPlannerCheckbox(e){
-
+            console.log(e);
             //Si l'utilisateur qui clique est admin, on ne coche/disable pas la checkbox.
             if(isAdmin){
                 return;
             }
-
-
             if(stateInput.value === "Annulée" || stateInput.value === "Créée" || stateInput.value === "Archivée"){
                 plannerCheckbox.checked = true;
                 plannerCheckbox.disabled = true;
@@ -188,7 +252,61 @@
         //Au chargement de la page, donc du script on vérifie aussi l'état.
         checkForPlannerCheckbox();
 
-        console.log(stateInput, plannerCheckbox)
+
+
+
+        //Fonctionnement du bouton de changement de vue
+        const cardContainer = document.querySelector(".card-container");
+        const tableContainer = document.querySelector(".table-container");
+
+        const switchBtn = document.getElementById("switch-vue-btn");
+
+        switchBtn.addEventListener('click', switchVue);
+
+        function switchVue(e){
+            e.preventDefault();
+            console.log("Avant fonction : ", cardContainer.classList, tableContainer.classList)
+            if(cardContainer.classList.contains('grid')){
+                cardContainer.classList.remove('grid');
+                cardContainer.classList.add('hidden');
+
+                tableContainer.classList.remove('hidden');
+                tableContainer.classList.add('block');
+
+                switchBtn.textContent = "Vue cartes"
+                return
+            }
+
+            if(tableContainer.classList.contains('block')){
+                tableContainer.classList.remove('block');
+                tableContainer.classList.add('hidden');
+
+                cardContainer.classList.remove('hidden');
+                cardContainer.classList.add('grid');
+
+                switchBtn.textContent = "Vue tableau"
+
+                return
+            }
+
+            console.log("Après fonction : ", cardContainer.classList, tableContainer.classList)
+
+        }
+
+
+        //Empêcher la modification des inputs dates (dans tableau) sans disabled
+
+        const dateTableInputs = [...document.querySelectorAll(".js-table-date")];
+        const dateInputsOriginalValues = dateTableInputs.map(dateInput => dateInput.value);
+
+        dateTableInputs.forEach(input=>input.addEventListener("change", preventChange));
+
+        function preventChange(e){
+            console.log(e.target, e);
+            e.preventDefault();
+            e.target.value = e.target.defaultValue;
+
+        }
 
     </script>
 {% endblock %}
