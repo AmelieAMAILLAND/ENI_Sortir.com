@@ -9,19 +9,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
     // stockage et récupération des données du formulaire lors de la création ou de la modification d'un lieu
 
     const destockDatas = () =>{
-        if (sessionStorage.getItem("name")){
-            document.getElementById("event_name").value=sessionStorage.getItem("name");
-            document.getElementById("event_dateTimeStart").value=sessionStorage.getItem("dateTimeStart");
-            document.getElementById("event_duration").value=sessionStorage.getItem("duration");
-            document.getElementById("event_registrationDeadline").value=sessionStorage.getItem("registrationDeadline");
-            document.getElementById("event_maxNbRegistration").value=sessionStorage.getItem("maxNbRegistration");
-            document.getElementById("event_infoEvent").value=sessionStorage.getItem("infoEvent");
-            sessionStorage.removeItem("name");
-            sessionStorage.removeItem("dateTimeStart");
-            sessionStorage.removeItem("duration");
-            sessionStorage.removeItem("registrationDeadline");
-            sessionStorage.removeItem("maxNbRegistration");
-            sessionStorage.removeItem("infoEvent");
+        if (sessionStorage.getItem('datas')){
+            datas=JSON.parse(sessionStorage.getItem("datas"));
+            console.log(datas);
+            document.getElementById("event_name").value=datas.name;
+            document.getElementById("event_dateTimeStart").value=datas.dateTimeStart;
+            document.getElementById("event_duration").value=datas.duration;
+            document.getElementById("event_registrationDeadline").value=datas.registrationDeadline;
+            document.getElementById("event_maxNbRegistration").value=datas.maxNbRegistration;
+            document.getElementById("event_infoEvent").value=datas.infoEvent;
+            sessionStorage.removeItem("datas");
         }
     }
 
@@ -34,12 +31,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         const registrationDeadline = document.getElementById("event_registrationDeadline").value;
         const maxNbRegistration = document.getElementById("event_maxNbRegistration").value;
         const infoEvent = document.getElementById("event_infoEvent").value;
-        sessionStorage.setItem("name",name);
-        sessionStorage.setItem("dateTimeStart",dateTimeStart);
-        sessionStorage.setItem("duration",duration);
-        sessionStorage.setItem("registrationDeadline",registrationDeadline);
-        sessionStorage.setItem("maxNbRegistration",maxNbRegistration);
-        sessionStorage.setItem("infoEvent",infoEvent);
+        const datas = JSON.stringify({'name':name, 'dateTimeStart':dateTimeStart, 'duration':duration, 'registrationDeadLine':registrationDeadline,
+        'maxNbRegistration':maxNbRegistration, 'infoEvent':infoEvent})
+        sessionStorage.setItem('datas', datas);
     }
 
     const placeBtns = document.querySelectorAll(".js-place-btn");

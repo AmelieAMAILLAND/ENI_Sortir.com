@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
@@ -130,7 +131,7 @@ class EventController extends AbstractController
 
 
     #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
+    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SerializerInterface $serializer): Response
     {
         if (!$event){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il n\'existe pas');
@@ -138,7 +139,7 @@ class EventController extends AbstractController
         }
         $owner = $event->getPlanner();
 
-        $places = $placeRepository->findAll();
+        $places = $serializer->serialize($placeRepository->findAll(), 'json');
 
         if ($owner === $this->getUser() && ($event->getState() === 'created' || $event->getState() === 'published')) {
             $newPlaceId = $request->query->get('newPlaceId');
