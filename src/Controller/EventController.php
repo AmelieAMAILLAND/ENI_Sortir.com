@@ -54,11 +54,9 @@ class EventController extends AbstractController
         $events = $eventRepository->findWithMultipleFilters($filtersDTO, $user);
 
         //Faire un dernier filtre (qui garde seulement les évènements dont le statut n'est pas 'archived') OU ceux avec 'archived' MAIS dont on est l'organisateur
-        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'archived')) || ($event->getState() != 'archived'));
-
-
-        //Comme filtre Twig personnalisé ne fonctionne pas. On créer un tableau
-
+        if(!in_array('ROLE_ADMIN',$user->getRoles())){
+            $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'archived')) || ($event->getState() != 'archived'));
+        }
 
 
         $statusArray = ['Ouverte', 'Complète', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
@@ -69,7 +67,8 @@ class EventController extends AbstractController
             'events' => $events,
             'statusArray' => $statusArray,
             'sites'=>$sites,
-            'filters'=>$filtersDTO
+            'filters'=>$filtersDTO,
+            'vue'=>$request->query->get('vue', 'cards')
         ]);
     }
 
