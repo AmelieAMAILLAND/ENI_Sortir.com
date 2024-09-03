@@ -1,4 +1,7 @@
 
+
+// PARTIE FIXE DONC PAS BESOIN DE REFRESH LES SELECTIONS
+
 //Gestion du bouton de réinitialisation
 const resetBtn = document.getElementById('reset-filters-btn');
 
@@ -51,18 +54,29 @@ checkForPlannerCheckbox();
 
 
 
+//PARTIE GÉRANT LA VUE DONC SELECTION D'ELEMENTS changeant.
+
+
+function refreshSelection(){
+
+    const cardContainer = document.querySelector(".cards-container");
+    const tableContainer = document.querySelector(".table-container");
+
+    const vueParameter = document.getElementById("js-vue-params");
+
+    return {cardContainer, tableContainer, vueParameter}
+}
+
 //Fonctionnement du bouton de changement de vue
-const cardContainer = document.querySelector(".card-container");
-const tableContainer = document.querySelector(".table-container");
-
-const vueParameter = document.getElementById("js-vue-params");
-
 const switchBtn = document.getElementById("switch-vue-btn");
 
 switchBtn.addEventListener('click', switchVue);
 
 function switchVue(e){
     e.preventDefault();
+
+    const {cardContainer, tableContainer, vueParameter} = refreshSelection()
+
     if(cardContainer.classList.contains('grid')){
         cardContainer.classList.remove('grid');
         cardContainer.classList.add('hidden');
@@ -73,6 +87,8 @@ function switchVue(e){
         switchBtn.textContent = "Vue cartes"
 
         vueParameter.value = "table"
+
+        console.log(vueParameter)
         return
     }
 
@@ -86,19 +102,10 @@ function switchVue(e){
         switchBtn.textContent = "Vue tableau"
 
         vueParameter.value = "cards"
+        console.log(vueParameter)
 
         return
     }
 }
 
 
-//Empêcher la modification des inputs dates (dans tableau) sans disabled
-const unchangeableDateInputs = [...document.querySelectorAll(".js-unchangeable-date")];
-
-unchangeableDateInputs.forEach(input=>input.addEventListener("change", preventChange));
-
-function preventChange(e){
-    e.preventDefault();
-    e.target.value = e.target.defaultValue;
-
-}

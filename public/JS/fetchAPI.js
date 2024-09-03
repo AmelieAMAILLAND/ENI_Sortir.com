@@ -1,47 +1,60 @@
 
-
-
-console.log("Bonjour depuis fetchAPI.js");
-
-
 function collectInputsValues(){
     const statusAndSite = [...document.querySelectorAll('.js-select-input')].map(input=>input.value);
     const nameParam = document.getElementById('nameInput').value;
     const beginAndEndDate = [...document.querySelectorAll('.js-date-input')].map(input=>input.value);
     const planner = document.querySelector('.js-checkboxes-input').checked;
-    const registeredBtn = document.getElementById('registeredAll').value;
 
-    const vueParam = document.getElementById("js-vue-params").checked;
+    const registeredBtns = [...document.querySelectorAll("input[name='registered']")];
 
-    console.log([statusAndSite, nameParam, beginAndEndDate, planner, registeredBtn, vueParam]);
+    const checkedRegistered = registeredBtns.filter(input=>!!input.checked)[0].value;
 
-    return [statusAndSite, nameParam, beginAndEndDate, planner, registeredBtn, vueParam];
+
+    const vueParam = document.getElementById("js-vue-params").value;
+
+    console.log([statusAndSite, nameParam, beginAndEndDate, planner, checkedRegistered, vueParam]);
+
+    return [statusAndSite, nameParam, beginAndEndDate, planner, checkedRegistered, vueParam];
 }
 
 
 
 const userId = document.getElementById('js-user-id').textContent;
 const userPseudo = document.getElementById('js-user-pseudo').textContent;
+ const isUserAnAdmin = !!document.getElementById('isAdmin');
 
 
 const parametersValues = collectInputsValues();
 
 function buildRequestUrlFromParams(parametersValues){
 
+
     let baseUrl = `http://localhost:8000/api/events/${userId}/`;
 
-    let paramsString = `?status=${parametersValues[0][0]}&siteName=${parametersValues[0][1]}&nameInput=${parametersValues[1]}&beginDate=${parametersValues[2][0]}&endDate=${parametersValues[2][1]}${ parametersValues[3] ? '&planner=on' : ''}&registered=${parametersValues[4]}$vue=${parametersValues[5] ? 'cards' : 'table'}`;
+    let paramsString = `?status=${parametersValues[0][0]}&siteName=${parametersValues[0][1]}&nameInput=${parametersValues[1]}&beginDate=${parametersValues[2][0]}&endDate=${parametersValues[2][1]}${ parametersValues[3] ? '&isPlanner=on' : ''}&registered=${parametersValues[4]}&vue=${parametersValues[5]}`;
 
+    console.log(baseUrl+paramsString);
     return baseUrl+paramsString;
 
 }
+
 
 async function fetchEventAPI(url){
 
     try{
         const response = await fetch(url);
-        const data = await response.json()
-        console.log(data);
+        let data = await response.json()
+
+        //console.log("Avant filtre: ", data);
+
+        //On remet le dernier filtre sur l'affichage des éléments 'archived' si on n'est pas admin OU pas l'organisateur.
+
+        if(!isUserAnAdmin){
+            data = data.filter(event => (event.state !== 'archived') || (event.state='archived' && event.planner.pseudo === userPseudo))
+        }
+
+       // console.log("Après filtre: ", data);
+
         return data;
 
     }catch(err){
@@ -54,10 +67,10 @@ async function fetchEventAPI(url){
 
 function fillTableTemplate(eventData) {
 
-    const vueParam = document.getElementById("js-vue-params").checked;
+    const vueParam = document.getElementById("js-vue-params").value;
 
     let rawBaseHtml = `
-    <div class="table-container max-w-[1200px] mx-auto ${vueParam ? "block" : 'block'} mb-10">
+    <div class="table-container max-w-[1200px] mx-auto ${vueParam === 'cards' ? "hidden" : 'block'} mb-10">
         <table class="table w-full">
             <thead>
             <tr class="border border-slate-900 bg-slate-900">
@@ -81,7 +94,7 @@ function fillTableTemplate(eventData) {
     }
 
     rawBaseHtml += `</tbody></table></div>`;
-    console.log(rawBaseHtml);
+    //console.log(rawBaseHtml);
 
     return rawBaseHtml;
 }
@@ -135,18 +148,18 @@ function buildEventTableHtml(event){
             </td>
             </tr>`;
 
-    console.log(event);
-    console.log(`Evènement : ${event.name}`,event.registered.find(user => user.id === userId), userId)
+    //console.log(event);
+    //onsole.log(`Evènement : ${event.name}`,event.registered.find(user => user.id === userId), userId)
     return eventHtml;
 }
 
 
 function fillCardsTemplate(eventData){
 
-    const vueParam = document.getElementById("js-vue-params").checked;
+    const vueParam = document.getElementById("js-vue-params").value;
 
 
-    let rawBaseHtml = `<div class="grid-cols-auto-fill-300 gap-4 max-w-[1200px] table-container mx-auto ${vueParam ? "grid" : "hidden"}">`;
+    let rawBaseHtml = `<div class="grid-cols-auto-fill-300 gap-4 max-w-[1200px] cards-container mx-auto ${vueParam === 'cards' ? "grid" : "hidden"}">`;
 
     if(eventData.length === 0){
         rawBaseHtml += `<p>Aucun évènements trouvé ! Essayez différents filtres ...</p>`;
@@ -155,7 +168,7 @@ function fillCardsTemplate(eventData){
     }
 
     rawBaseHtml += '</div>';
-    console.log(rawBaseHtml);
+    //console.log(rawBaseHtml);
 
     return rawBaseHtml;
 }
@@ -250,9 +263,11 @@ function mapStatusToFrench(status){
 }
 
 
-document.getElementById('fetchApiTest').addEventListener('click', e=> fetchAndDisplay())
+document.getElementById('submitBtn').addEventListener('click', e=>fetchAndDisplay())
 
 async function fetchAndDisplay(){
+
+    //e.preventDefault();
 
     let url = buildRequestUrlFromParams(collectInputsValues());
 
@@ -260,12 +275,49 @@ async function fetchAndDisplay(){
 
     console.log(events);
 
-    const tableContainer = document.querySelector('.js-test-table-container');
-    const cardsContainer = document.querySelector('.js-test-cards-container');
+    const tableContainer = document.querySelector('.js-table-container');
+    const cardsContainer = document.querySelector('.js-cards-container');
 
     tableContainer.innerHTML = fillTableTemplate(events);
     cardsContainer.innerHTML = fillCardsTemplate(events);
 
+
+    //On reselectionne les nouveaux inputs dates non changeant.
+    //Et on leur ajoute un écouteur d'évènement.
+    const unchangeableDates = [...document.querySelectorAll(".js-unchangeable-date")];
+    unchangeableDates.forEach(input=>input.addEventListener("change", preventChange));
+
 }
 
+//On appel l'API au chargement de la page.
 fetchAndDisplay();
+
+
+//Empèche la modification des inputs dates
+function preventChange(e){
+    e.preventDefault();
+    e.target.value = e.target.defaultValue;
+}
+
+//PARTIE TEST :
+//Rappel API à chaque changement dans les filtres.
+
+const resetButton = document.getElementById('reset-filters-btn');
+
+const statusAndSiteInputs = [...document.querySelectorAll('.js-select-input')];
+const nameFilterInput = document.getElementById('nameInput');
+const dateFilterInputs = [...document.querySelectorAll('.js-date-input')];
+const planner = document.getElementById('isPlanner');
+const registeredButtons = [...document.querySelectorAll("input[name='registered']")];
+
+
+const filtersListeningChange = [...statusAndSiteInputs, nameFilterInput,...dateFilterInputs, planner, ...registeredButtons];
+
+console.log(filtersListeningChange)
+filtersListeningChange.forEach(input=>input.addEventListener('change', e=>fetchAndDisplay()));
+resetButton.addEventListener('click', e=>fetchAndDisplay())
+
+
+
+
+
