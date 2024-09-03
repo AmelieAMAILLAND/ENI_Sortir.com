@@ -108,4 +108,31 @@ function switchVue(e){
     }
 }
 
+//Gestion de l'affichage des filtres en mode accordéon.
+
+const filtersToggler = document.querySelector('.toggle-container');
+const filtersContainer = document.querySelector('.form-container');
+
+const toggleImg = document.querySelector('.toggle-container img')
+
+console.log(filtersContainer, filtersToggler)
+
+filtersToggler.addEventListener('click', e=>toggleFilters());
+
+function toggleFilters(){
+
+    if(filtersContainer.classList.contains('hidden')){
+        toggleImg.setAttribute("src","/images/cross-black.svg")
+    }else{
+        toggleImg.setAttribute("src","/images/chevron-down.svg")
+    }
+
+    filtersContainer.classList.toggle('max-h-0')
+    filtersContainer.classList.toggle('overflow-hidden')
+    filtersContainer.classList.toggle('hidden')
+
+}
+
+toggleFilters();
+
 

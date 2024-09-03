@@ -210,13 +210,13 @@ function buildEventCardHtml(event){
         <div class="desc-container">
             <p>${event.infoEvent}</p>
         </div>
-        <div class="org-container flex justify-between">
+        <div class="org-container flex justify-between mb-2">
 
-            <p>Organisateur : <a href="http://localhost:8000/profil/${event.planner.id}" class="font-semibold hover:opacity-80">${event.planner.pseudo}</a></p>
+            <p>Organisateur : <a href="http://localhost:8000/profil/${event.planner.id}" class="font-semibold hover:opacity-80 ">${event.planner.pseudo}</a></p>
             <p class="">${mapStatusToFrench(event.state)}</p>
 
         </div>
-        <div class="actions-container mx-auto max-w-fit mt-2">
+        <div class="actions-container mx-auto max-w-[30%] flex gap-3 ">
             <a href="http://localhost:8000/event/${event.id}"
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>

@@ -17,6 +17,7 @@ class ApiEventController extends AbstractController
                               UserRepository $userRepository,
                               Request $request){
 
+        $user = $this->getUser();
         $user = $userRepository->find($request->get('idUser'));
 
         $filtersDTO = new FiltersDTO(null,'all','all',null,null,null,null);
