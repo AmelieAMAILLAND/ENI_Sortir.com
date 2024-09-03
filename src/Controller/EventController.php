@@ -32,8 +32,7 @@ class EventController extends AbstractController
         $this->logger = $logger;
     }
     #[Route('/', name: '_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository,
-                          SiteRepository $siteRepository,
+    public function index(SiteRepository $siteRepository,
                           Request $request,
                          // #[MapQueryString] filtersDTO $filtersDTO
     ): Response
@@ -51,26 +50,20 @@ class EventController extends AbstractController
             }
         }
 
-        $events = $eventRepository->findWithMultipleFilters($filtersDTO, $user);
-
-        //Faire un dernier filtre (qui garde seulement les évènements dont le statut n'est pas 'archived') OU ceux avec 'archived' MAIS dont on est l'organisateur
-        if(!in_array('ROLE_ADMIN',$user->getRoles())){
-            $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'archived')) || ($event->getState() != 'archived'));
-        }
-
-
         $statusArray = ['Ouverte', 'Complète', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
 
         $sites = $siteRepository->findAll();
-        
+
+        //Les évènements sont maintenant appelés en AJAX au chargement de la page et à chaque changement dans les filtres.
         return $this->render('event/index.html.twig', [
-            'events' => $events,
             'statusArray' => $statusArray,
             'sites'=>$sites,
             'filters'=>$filtersDTO,
             'vue'=>$request->query->get('vue', 'cards')
         ]);
     }
+
+
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response

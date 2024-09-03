@@ -75,255 +75,164 @@
 
             <div class="hidden-params hidden">
                 <input type="checkbox" id="js-vue-params" name="vue" value="cards" checked>
+                <p id="js-user-id">{{ app.user.id }}</p>
+                <p id="js-user-pseudo">{{ app.user.pseudo }}</p>
+                {% if 'ROLE_ADMIN' in app.user.roles %}
+                    <p class="hidden" id="isAdmin">admin</p>
+                {% endif %}
             </div>
 
-            {% if 'ROLE_ADMIN' in app.user.roles %}
-                <p class="hidden" id="isAdmin">admin</p>
-            {% endif %}
 
             <div class="btns-container min-w-[30%] flex flex-col items-center justify-center gap-4">
-                <button type="submit" id="submitBtn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
+                <button type="button" id="submitBtn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
                 <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-slate-600 text-white hover:opacity-80 shadow-md">Réinitialiser</button>
             </div>
 
         </form>
     </div>
     
-    <div class="card-container {{ vue == "cards" ? 'grid' : 'hidden' }} grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
-        {% for event in events %}
-            <div class="event-card
-            max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform
-            {{ event.state == 'published' ? 'bg-green-200' :
-            event.state == 'past' ? 'bg-gray-100' :
-            event.state == 'in_progress' ? 'bg-amber-50' :
-            event.state == 'archived' ? 'bg-gray-200 opacity-70' :
-            event.state == 'closed' ? 'bg-red-200' :
-            event.state == 'full' ? 'bg-stone-300' :
-            event.state == 'created' ? 'bg-blue-200' :
-            event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">
-                <div class="name-and-date-container flex justify-between items-center">
-                    <p class="font-semibold text-xl hover:opacity-80">
-                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>
-                    </p>
-                    <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">
-                </div>
-                <div class="inscr-container flex justify-between items-center">
-                    <div class="limit-container ">
-                        <p class="font-semibold">Date limite : </p>
-                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date p-0 border-0 bg-inherit text-sm">
-                    </div>
+{#    <div class="card-container {{ vue == "cards" ? 'grid' : 'hidden' }} grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">#}
+{#        {% for event in events %}#}
+{#            <div class="event-card#}
+{#            max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform#}
+{#            {{ event.state == 'published' ? 'bg-green-200' :#}
+{#            event.state == 'past' ? 'bg-gray-100' :#}
+{#            event.state == 'in_progress' ? 'bg-amber-50' :#}
+{#            event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+{#            event.state == 'closed' ? 'bg-red-200' :#}
+{#            event.state == 'full' ? 'bg-stone-300' :#}
+{#            event.state == 'created' ? 'bg-blue-200' :#}
+{#            event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+{#                <div class="name-and-date-container flex justify-between items-center">#}
+{#                    <p class="font-semibold text-xl hover:opacity-80">#}
+{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>#}
+{#                    </p>#}
+{#                    <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">#}
+{#                </div>#}
+{#                <div class="inscr-container flex justify-between items-center">#}
+{#                    <div class="limit-container ">#}
+{#                        <p class="font-semibold">Date limite : </p>#}
+{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date p-0 border-0 bg-inherit text-sm">#}
+{#                    </div>#}
 
-                    {% if (app.user.pseudo == event.planner.pseudo) %}
-                        <p class="text-blue-500 font-semibold">Organisateur</p>
-                    {% else %}
-                        {% if (app.user in event.registered) %}
-                            <p class="text-green-500 font-semibold">Inscrit</p>
-                        {% else %}
-                                <p class="text-red-500 font-semibold">Non inscrit</p>
-                        {% endif %}
-                    {% endif %}
+{#                    {% if (app.user.pseudo == event.planner.pseudo) %}#}
+{#                        <p class="text-blue-500 font-semibold">Organisateur</p>#}
+{#                    {% else %}#}
+{#                        {% if (app.user in event.registered) %}#}
+{#                            <p class="text-green-500 font-semibold">Inscrit</p>#}
+{#                        {% else %}#}
+{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+{#                        {% endif %}#}
+{#                    {% endif %}#}
 
-                </div>
-                <div class="place-container">
-                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>
-                </div>
-                <div class="desc-container">
-                    <p>{{ event.infoEvent }}</p>
-                </div>
-                <div class="org-container flex justify-between">
+{#                </div>#}
+{#                <div class="place-container">#}
+{#                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>#}
+{#                </div>#}
+{#                <div class="desc-container">#}
+{#                    <p>{{ event.infoEvent }}</p>#}
+{#                </div>#}
+{#                <div class="org-container flex justify-between">#}
 
-                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
-                    <p class="">{{ event.state | mapStatusToFrench }}</p>
+{#                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>#}
+{#                    <p class="">{{ event.state | mapStatusToFrench }}</p>#}
 
-                </div>
-                <div class="actions-container mx-auto max-w-fit mt-2">
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
-                    {% if event.planner.pseudo == app.user.pseudo %}
-                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
-                    {% endif %}
-                </div>
-
-
-            </div>
-
-        {% else %}
-            <div>
-                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>
-            </div>
-        {% endfor %}
+{#                </div>#}
+{#                <div class="actions-container mx-auto max-w-fit mt-2">#}
+{#                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+{#                    {% if event.planner.pseudo == app.user.pseudo %}#}
+{#                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+{#                    {% endif %}#}
+{#                </div>#}
 
 
-    </div>
+{#            </div>#}
 
-    <div class="table-container max-w-[1200px] mx-auto {{ vue == "cards" ? 'hidden' : 'block' }}">
-        <table class="table w-full">
-            <thead>
-            <tr class="border border-slate-900 bg-slate-900">
-                <th class="th-style">Nom</th>
-                <th class="th-style">Date de début</th>
-                <th class="th-style">Durée</th>
-                <th class="th-style">Clôture</th>
-                <th class="th-style">Inscrits/Places</th>
-                <th class="th-style">Inscrit</th>
-                <th class="th-style">État</th>
-                <th class="th-style">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for event in events %}
+{#        {% else %}#}
+{#            <div>#}
+{#                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>#}
+{#            </div>#}
+{#        {% endfor %}#}
 
-                <tr class="hover:opacity-80
-                    {{ event.state == 'published' ? 'bg-green-200' :
-                event.state == 'past' ? 'bg-gray-100' :
-                event.state == 'in_progress' ? 'bg-amber-50' :
-                event.state == 'archived' ? 'bg-gray-200 opacity-70' :
-                event.state == 'closed' ? 'bg-red-200' :
-                event.state == 'full' ? 'bg-stone-300' :
-                event.state == 'created' ? 'bg-blue-200' :
-                event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">
 
-                    <td class="td-style">{{ event.name }}</td>
-                    <td class="td-style">
-                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">
-                    </td>
+{#    </div>#}
+
+{#    <div class="table-container max-w-[1200px] mx-auto {{ vue == "cards" ? 'hidden' : 'block' }}">#}
+{#        <table class="table w-full">#}
+{#            <thead>#}
+{#            <tr class="border border-slate-900 bg-slate-900">#}
+{#                <th class="th-style">Nom</th>#}
+{#                <th class="th-style">Date de début</th>#}
+{#                <th class="th-style">Durée</th>#}
+{#                <th class="th-style">Clôture</th>#}
+{#                <th class="th-style">Inscrits/Places</th>#}
+{#                <th class="th-style">Inscrit</th>#}
+{#                <th class="th-style">État</th>#}
+{#                <th class="th-style">Actions</th>#}
+{#            </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#            {% for event in events %}#}
+
+{#                <tr class="hover:opacity-80#}
+{#                    {{ event.state == 'published' ? 'bg-green-200' :#}
+{#                event.state == 'past' ? 'bg-gray-100' :#}
+{#                event.state == 'in_progress' ? 'bg-amber-50' :#}
+{#                event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+{#                event.state == 'closed' ? 'bg-red-200' :#}
+{#                event.state == 'full' ? 'bg-stone-300' :#}
+{#                event.state == 'created' ? 'bg-blue-200' :#}
+{#                event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+
+{#                    <td class="td-style">{{ event.name }}</td>#}
+{#                    <td class="td-style">#}
+{#                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+{#                    </td>#}
 {#                    <td class="td-style">{{ event.dateTimeStart ? event.dateTimeStart|date('d/m/Y H:i') : '' }}</td>#}
-                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>
-                    <td class="td-style">
-                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">
-                    </td>
-                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>
-                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}
-                            <p class="text-blue-500 font-semibold">Organisateur</p>
-                        {% else %}
-                            {% if (app.user in event.registered) %}
-                                <p class="text-green-500 font-semibold">Inscrit</p>
-                            {% else %}
-                                <p class="text-red-500 font-semibold">Non inscrit</p>
-                            {% endif %}
-                        {% endif %}</td>
-                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>
-                    <td class="td-style flex justify-center items-center gap-1">
-                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
-                        {% if event.planner.pseudo == app.user.pseudo %}
-                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{#                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
+{#                    <td class="td-style">#}
+{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+{#                    </td>#}
+{#                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>#}
+{#                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}#}
+{#                            <p class="text-blue-500 font-semibold">Organisateur</p>#}
+{#                        {% else %}#}
+{#                            {% if (app.user in event.registered) %}#}
+{#                                <p class="text-green-500 font-semibold">Inscrit</p>#}
+{#                            {% else %}#}
+{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+{#                            {% endif %}#}
+{#                        {% endif %}</td>#}
+{#                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>#}
+{#                    <td class="td-style flex justify-center items-center gap-1">#}
+{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+{#                        {% if event.planner.pseudo == app.user.pseudo %}#}
+{#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+{#                        {% endif %}#}
+{#                    </td>#}
+{#                </tr>#}
+{#            {% else %}#}
+{#                <tr>#}
+{#                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </div>#}
 
+
+    <div class="js-cards-container">
+    </div>
+    <div class="js-table-container">
+    </div>
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
-
-    <script defer>
-        const resetBtn = document.getElementById('reset-filters-btn');
-
-        const selectInputs = [...document.querySelectorAll('.js-select-input')];
-        const nameInput = document.getElementById('nameInput');
-        const dateInputs = [...document.querySelectorAll('.js-date-input')];
-        const checkboxes = [...document.querySelectorAll('.js-checkboxes-input')];
-        const defaultRadioBtn = document.getElementById('registeredAll');
-
-        resetBtn.addEventListener('click', handleFormReset)
-
-        function handleFormReset(e){
-            e.preventDefault();
-            selectInputs.forEach(selectInput => selectInput.value = "all");
-            nameInput.value = "";
-            dateInputs.forEach(dateInput => dateInput.value = "");
-            checkboxes.forEach(checkbox=>checkbox.checked = false);
-            defaultRadioBtn.checked = true;
-
-            if(plannerCheckbox.disabled) plannerCheckbox.disabled = false;
-        }
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('JS/main_page_utils.js') }}" defer></script>
+        <script src="{{ asset('JS/fetchAPI.js') }}" defer></script>
+    {% endblock %}
 
 
-        const stateInput = document.getElementById('status');
-        const plannerCheckbox = document.getElementById('isPlanner');
-
-        const isAdmin = !!document.getElementById('isAdmin');
-
-
-        stateInput.addEventListener('change', checkForPlannerCheckbox)
-
-        function checkForPlannerCheckbox(e){
-            console.log(e);
-            //Si l'utilisateur qui clique est admin, on ne coche/disable pas la checkbox.
-            if(isAdmin){
-                return;
-            }
-            if(stateInput.value === "Annulée" || stateInput.value === "Créée" || stateInput.value === "Archivée"){
-                plannerCheckbox.checked = true;
-                plannerCheckbox.disabled = true;
-            }else{
-                plannerCheckbox.disabled = false;
-            }
-        }
-
-        //Au chargement de la page, donc du script on vérifie aussi l'état.
-        checkForPlannerCheckbox();
-
-
-
-
-        //Fonctionnement du bouton de changement de vue
-        const cardContainer = document.querySelector(".card-container");
-        const tableContainer = document.querySelector(".table-container");
-
-        const vueParameter = document.getElementById("js-vue-params");
-
-        const switchBtn = document.getElementById("switch-vue-btn");
-
-        switchBtn.addEventListener('click', switchVue);
-
-        function switchVue(e){
-            e.preventDefault();
-            if(cardContainer.classList.contains('grid')){
-                cardContainer.classList.remove('grid');
-                cardContainer.classList.add('hidden');
-
-                tableContainer.classList.remove('hidden');
-                tableContainer.classList.add('block');
-
-                switchBtn.textContent = "Vue cartes"
-
-                vueParameter.value = "table"
-                return
-            }
-
-            if(tableContainer.classList.contains('block')){
-                tableContainer.classList.remove('block');
-                tableContainer.classList.add('hidden');
-
-                cardContainer.classList.remove('hidden');
-                cardContainer.classList.add('grid');
-
-                switchBtn.textContent = "Vue tableau"
-
-                vueParameter.value = "cards"
-
-                return
-            }
-        }
-
-
-        //Empêcher la modification des inputs dates (dans tableau) sans disabled
-        const unchangeableDateInputs = [...document.querySelectorAll(".js-unchangeable-date")];
-
-        unchangeableDateInputs.forEach(input=>input.addEventListener("change", preventChange));
-
-        function preventChange(e){
-            e.preventDefault();
-            e.target.value = e.target.defaultValue;
-
-        }
-
-    </script>
 {% endblock %}

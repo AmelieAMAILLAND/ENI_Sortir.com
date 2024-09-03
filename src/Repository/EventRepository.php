@@ -126,7 +126,7 @@ class EventRepository extends ServiceEntityRepository
                 }
                 //Fonctionne pas ... limité pour faires des opérations entre champs de l'entité (dateStart + duration ...)
 //                if($filtersDTO->status == 'En_cours'){
-//                    $now = (new \DateTime())->modify('+2 hours'); 
+//                    $now = (new \DateTime())->modify('+2 hours');
 //
 //                    // Ajouter une expression native SQL pour calculer la date de fin
 //                    $query->andWhere('e.dateTimeStart <= :currentDate')
