@@ -5,8 +5,12 @@
 {% block body %}
     <h1 class="text-center text-3xl font-semibold my-3">Les sorties</h1>
 
+    <div class="vue-btn-container">
+        <button id="switch-vue-btn" class="py-1 px-2 rounded-md w-[120px] bg-red-200 fixed top-[120px] right-[20px]">Vue tableau</button>
+    </div>
+
     <div class="form-container mb-6 border border-slate-500 py-4 px-6 max-w-[1200px] mx-auto shadow-md rounded-md">
-        <form method="GET" class="flex justify-between">
+        <form method="GET" class="filters-form flex justify-between">
             <div class="filters-container flex flex-col gap-2 min-w-[50%]">
                 <div class="status-site-container flex gap-3 justify-between">
                     <div class="status-container">
@@ -45,8 +49,11 @@
 {#                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>#}
 {#                        </div>#}
                         <div class="planner-container">
-                            <label for="isPlanner">Dont je suis organisateur</label>
-                            <input type="checkbox" id="isPlanner" name="isPlanner" {{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input">
+                            <label class="flex justify-between items-center gap-2">
+                                Dont je suis organisateur
+                            <input type="checkbox" name="isPlanner" id="isPlanner"{{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input peer hidden bg-transparent">
+                            <span class="bg-gray-300 w-11 h-7 rounded-full flex flex-shrink-0 items-center after:bg-white after:w-5 after:h-5 after:rounded-full p-1 peer-checked:bg-green-500 peer-disabled:bg-red-500 peer-checked:after:translate-x-4 ease-in-out duration-400 after:duration-300"></span>
+                            </label>
                         </div>
                     </div>
                     <div class="registered-container flex justify-between ">
@@ -63,115 +70,169 @@
                             <input type="radio" name="registered" value="notRegistered" id="notRegistered" {{ filters.registered == "notRegistered" ? 'checked' : '' }}>
                         </div>
                     </div>
-                    <input type="hidden" value="{{ app.user.pseudo }}" name="userPseudo">
                 </div>
             </div>
 
+            <div class="hidden-params hidden">
+                <input type="checkbox" id="js-vue-params" name="vue" value="cards" checked>
+                <p id="js-user-id">{{ app.user.id }}</p>
+                <p id="js-user-pseudo">{{ app.user.pseudo }}</p>
+                {% if 'ROLE_ADMIN' in app.user.roles %}
+                    <p class="hidden" id="isAdmin">admin</p>
+                {% endif %}
+            </div>
+
+
             <div class="btns-container min-w-[30%] flex flex-col items-center justify-center gap-4">
-                <button type="submit" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
+                <button type="button" id="submitBtn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-amber-400 text-white hover:opacity-80 shadow-md">Filtrer</button>
                 <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-slate-600 text-white hover:opacity-80 shadow-md">Réinitialiser</button>
             </div>
 
         </form>
     </div>
     
-    <div class="grid grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">
+{#    <div class="card-container {{ vue == "cards" ? 'grid' : 'hidden' }} grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">#}
+{#        {% for event in events %}#}
+{#            <div class="event-card#}
+{#            max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform#}
+{#            {{ event.state == 'published' ? 'bg-green-200' :#}
+{#            event.state == 'past' ? 'bg-gray-100' :#}
+{#            event.state == 'in_progress' ? 'bg-amber-50' :#}
+{#            event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+{#            event.state == 'closed' ? 'bg-red-200' :#}
+{#            event.state == 'full' ? 'bg-stone-300' :#}
+{#            event.state == 'created' ? 'bg-blue-200' :#}
+{#            event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+{#                <div class="name-and-date-container flex justify-between items-center">#}
+{#                    <p class="font-semibold text-xl hover:opacity-80">#}
+{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>#}
+{#                    </p>#}
+{#                    <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">#}
+{#                </div>#}
+{#                <div class="inscr-container flex justify-between items-center">#}
+{#                    <div class="limit-container ">#}
+{#                        <p class="font-semibold">Date limite : </p>#}
+{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date p-0 border-0 bg-inherit text-sm">#}
+{#                    </div>#}
 
-        {% for event in events %}
-            <div class="event-card {{ event.state | mapStatusForTailwind}} max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md ">
-                <div class="name-and-date-container flex justify-between items-end">
-                    <p class="font-semibold text-xl hover:opacity-80">
-                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>
-                    </p>
-                    <p class="font-semibold">{{ event.dateTimeStart ? event.dateTimeStart|date('d-m-Y à H:i') : '' }}</p>
-                </div>
-                <div class="inscr-container flex justify-between items-center">
-                    <div class="limit-container ">
-                        <p class="font-semibold">Date limite : </p>
-                        <p> {{ event.registrationDeadline ? event.registrationDeadline|date('d-m-Y - H:i') : '' }}</p>
-                    </div>
+{#                    {% if (app.user.pseudo == event.planner.pseudo) %}#}
+{#                        <p class="text-blue-500 font-semibold">Organisateur</p>#}
+{#                    {% else %}#}
+{#                        {% if (app.user in event.registered) %}#}
+{#                            <p class="text-green-500 font-semibold">Inscrit</p>#}
+{#                        {% else %}#}
+{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+{#                        {% endif %}#}
+{#                    {% endif %}#}
 
-                    {% if app.user in event.registered %}
-                        <img src="{{ asset('images/registered.svg') }}" alt="icone correcte" class="w-10">
-                    {% else %}
-                        <img src="{{ asset('images/notRegistered.svg') }}" alt="icone fausse" class="w-10">
-                    {% endif %}
+{#                </div>#}
+{#                <div class="place-container">#}
+{#                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>#}
+{#                </div>#}
+{#                <div class="desc-container">#}
+{#                    <p>{{ event.infoEvent }}</p>#}
+{#                </div>#}
+{#                <div class="org-container flex justify-between">#}
 
-                </div>
-                <div class="place-container">
-                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>
-                </div>
-                <div class="desc-container">
-                    <p>{{ event.infoEvent }}</p>
-                </div>
-                <div class="org-container flex justify-between">
+{#                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>#}
+{#                    <p class="">{{ event.state | mapStatusToFrench }}</p>#}
 
-                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
-                    <p class="">{{ event.state | upper }}</p>
-
-                </div>
-                <div class="actions-container mx-auto max-w-fit mt-2">
-                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>
-                    {% if event.planner.pseudo == app.user.pseudo %}
-                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>
-                    {% endif %}
-                </div>
-            </div>
-
-        {% else %}
-            <div>
-                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>
-            </div>
-        {% endfor %}
+{#                </div>#}
+{#                <div class="actions-container mx-auto max-w-fit mt-2">#}
+{#                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+{#                    {% if event.planner.pseudo == app.user.pseudo %}#}
+{#                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+{#                    {% endif %}#}
+{#                </div>#}
 
 
+{#            </div>#}
+
+{#        {% else %}#}
+{#            <div>#}
+{#                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>#}
+{#            </div>#}
+{#        {% endfor %}#}
+
+
+{#    </div>#}
+
+{#    <div class="table-container max-w-[1200px] mx-auto {{ vue == "cards" ? 'hidden' : 'block' }}">#}
+{#        <table class="table w-full">#}
+{#            <thead>#}
+{#            <tr class="border border-slate-900 bg-slate-900">#}
+{#                <th class="th-style">Nom</th>#}
+{#                <th class="th-style">Date de début</th>#}
+{#                <th class="th-style">Durée</th>#}
+{#                <th class="th-style">Clôture</th>#}
+{#                <th class="th-style">Inscrits/Places</th>#}
+{#                <th class="th-style">Inscrit</th>#}
+{#                <th class="th-style">État</th>#}
+{#                <th class="th-style">Actions</th>#}
+{#            </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#            {% for event in events %}#}
+
+{#                <tr class="hover:opacity-80#}
+{#                    {{ event.state == 'published' ? 'bg-green-200' :#}
+{#                event.state == 'past' ? 'bg-gray-100' :#}
+{#                event.state == 'in_progress' ? 'bg-amber-50' :#}
+{#                event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+{#                event.state == 'closed' ? 'bg-red-200' :#}
+{#                event.state == 'full' ? 'bg-stone-300' :#}
+{#                event.state == 'created' ? 'bg-blue-200' :#}
+{#                event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+
+{#                    <td class="td-style">{{ event.name }}</td>#}
+{#                    <td class="td-style">#}
+{#                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+{#                    </td>#}
+{#                    <td class="td-style">{{ event.dateTimeStart ? event.dateTimeStart|date('d/m/Y H:i') : '' }}</td>#}
+{#                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
+{#                    <td class="td-style">#}
+{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+{#                    </td>#}
+{#                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>#}
+{#                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}#}
+{#                            <p class="text-blue-500 font-semibold">Organisateur</p>#}
+{#                        {% else %}#}
+{#                            {% if (app.user in event.registered) %}#}
+{#                                <p class="text-green-500 font-semibold">Inscrit</p>#}
+{#                            {% else %}#}
+{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+{#                            {% endif %}#}
+{#                        {% endif %}</td>#}
+{#                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>#}
+{#                    <td class="td-style flex justify-center items-center gap-1">#}
+{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+{#                        {% if event.planner.pseudo == app.user.pseudo %}#}
+{#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+{#                        {% endif %}#}
+{#                    </td>#}
+{#                </tr>#}
+{#            {% else %}#}
+{#                <tr>#}
+{#                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </div>#}
+
+
+    <div class="js-cards-container">
+    </div>
+    <div class="js-table-container">
     </div>
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
-
-    <script defer>
-        const resetBtn = document.getElementById('reset-filters-btn');
-
-        const selectInputs = [...document.querySelectorAll('.js-select-input')];
-        const nameInput = document.getElementById('nameInput');
-        const dateInputs = [...document.querySelectorAll('.js-date-input')];
-        const checkboxes = [...document.querySelectorAll('.js-checkboxes-input')];
-        const defaultRadioBtn = document.getElementById('registeredAll');
-
-        resetBtn.addEventListener('click', handleFormReset)
-
-        function handleFormReset(e){
-            e.preventDefault();
-            selectInputs.forEach(selectInput => selectInput.value = "all");
-            nameInput.value = "";
-            dateInputs.forEach(dateInput => dateInput.value = "");
-            checkboxes.forEach(checkbox=>checkbox.checked = false);
-            defaultRadioBtn.checked = true;
-
-            if(plannerCheckbox.disabled) plannerCheckbox.disabled = false;
-        }
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('JS/main_page_utils.js') }}" defer></script>
+        <script src="{{ asset('JS/fetchAPI.js') }}" defer></script>
+    {% endblock %}
 
 
-        const stateInput = document.getElementById('status');
-        const plannerCheckbox = document.getElementById('isPlanner');
-
-
-        stateInput.addEventListener('change', checkForPlannerCheckbox)
-
-        function checkForPlannerCheckbox(e){
-            if(stateInput.value === "Annulée" || stateInput.value === "Créée"){
-                plannerCheckbox.checked = true;
-                plannerCheckbox.disabled = true;
-            }else{
-                plannerCheckbox.disabled = false;
-            }
-        }
-
-        //Au chargement de la page, donc du script on vérifie aussi l'état.
-        checkForPlannerCheckbox();
-
-        console.log(stateInput, plannerCheckbox)
-
-    </script>
 {% endblock %}

@@ -33,15 +33,14 @@ class EventController extends AbstractController
         $this->logger = $logger;
     }
     #[Route('/', name: '_index', methods: ['GET'])]
-    public function index(EventRepository $eventRepository,
-                          SiteRepository $siteRepository,
+    public function index(SiteRepository $siteRepository,
                           Request $request,
                          // #[MapQueryString] filtersDTO $filtersDTO
     ): Response
     {
         $user = $this->getUser();
 
-        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null,$user->getPseudo());
+        $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null);
 
         $filters = $request->query->all();
         if($filters) {
@@ -52,23 +51,20 @@ class EventController extends AbstractController
             }
         }
 
-        $events = $eventRepository->findWithMultipleFilters($filtersDTO);
-
-        //Parmis tous les évènements récupérés, on les gardes tous sauf ceux pas encore publiés et dont on n'est pas l'organisateur.
-        //Donc on garde ceux qui sont en 'createdé et dont on est l'organisateur ET ceux qui sont pas en 'created'.
-//        $events = array_filter($events, fn(Event $event) => (($event->getPlanner()->getPseudo() == $user->getPseudo()) && ($event->getState() == 'created')) || ($event->getState() != 'created'));
-
-        $statusArray = ['Ouverte', 'Passée', 'Fermée', 'Créée', 'Annulée'];
+        $statusArray = ['Ouverte', 'Complète', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
 
         $sites = $siteRepository->findAll();
-        
+
+        //Les évènements sont maintenant appelés en AJAX au chargement de la page et à chaque changement dans les filtres.
         return $this->render('event/index.html.twig', [
-            'events' => $events,
             'statusArray' => $statusArray,
             'sites'=>$sites,
-            'filters'=>$filtersDTO
+            'filters'=>$filtersDTO,
+            'vue'=>$request->query->get('vue', 'cards')
         ]);
     }
+
+
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
