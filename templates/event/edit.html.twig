@@ -20,7 +20,8 @@
         <div class="modal w-11/12 max-w-2xl min-w-80 p-7 bg-white rounded absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <button class="js-close-modal modal-trigger px-2 py-1 rounded text-lg absolute top-2.5 right-2.5 bg-red-600 text-white">X</button>
             <h1 id="title-modal" class="mb-2.5 text-2xl font-medium">Choisissez un lieu pour votre activité</h1>
-            <div id="map" class="h-96 w-100"></div>
+            <div id="map" class="h-96 w-100 mb-2"></div>
+            <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Nouveau lieu</a>
         </div>
 
     </aside>

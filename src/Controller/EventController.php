@@ -275,4 +275,5 @@ class EventController extends AbstractController
         $entityManager->flush();
         return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
     }
+
 }
