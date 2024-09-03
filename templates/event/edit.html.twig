@@ -10,10 +10,11 @@
 
 {% block body %}
 
-    <script>
-        const places = {{ places|raw }};
-
-    </script>
+    <div class="js-datas" data-places="{{ places }}" data-current-event="{{ event|serialize(format='json') }}"></div>
+{#    <script>#}
+{#        const places = {{ places|raw }};#}
+{#        const currentEvent = {{ event }}#}
+{#    </script>#}
     <aside id="modal" class="modal-container fixed top-0 left-0 w-screen h-screen bg-gray-500/75 hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="title-modal">
         <div class="overlay absolute w-full h-full bg-gray-500/75 js-close-modal"></div>
         <div class="modal w-11/12 max-w-2xl min-w-80 p-7 bg-white rounded absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -39,15 +40,17 @@
                 {{ form_row(form.infoEvent) }}
             </div>
             <div class="flex-row">
-{#                {{ form_row(form.place) }}#}
-                {{ form_label(form.place) }}
+                <div class="hidden">
+                    {{ form_row(form.place) }}
+                </div>
+                <p>Lieu</p>
                 <input id="place-name" class="mt-1 mb-2 w-full" disabled value="{{ event.place.name }}">
                 <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Nouveau lieu</a>
-                {% if event.place %}
-                    <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn" id="place-edit">Modifier</a>
-                {% else %}
-                    <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">{#&#x270e;#}Modifier</a>
-                {% endif %}
+{#                {% if event.place %}#}
+{#                    <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn" id="place-edit">Modifier</a>#}
+{#                {% else %}#}
+{#                    <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">#}{#&#x270e;#}{#Modifier</a>#}
+{#                {% endif %}#}
                 <a href="#modal" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto modal-btn js-modal hover:opacity-80">Choisir</a>
             </div>
             <div>
@@ -62,7 +65,7 @@
 
                 {% do form.submit.setRendered %} {# pour les exclures du form_rest #}
                 {% do form.publish.setRendered %}
-                {% do form.place.setRendered %}
+{#                {% do form.place.setRendered %}#}
 
                 {{ form_rest(form) }} {# pour passer le token #}
 

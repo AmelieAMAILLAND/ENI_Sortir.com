@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -51,16 +52,19 @@ class Event
     #[ORM\ManyToOne(inversedBy: 'plannedEvents')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: 'Il faut un organisateur')]
+    #[Ignore]
     private ?User $planner = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'registeredFor')]
+    #[Ignore]
     private Collection $registered;
 
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Ignore]
     private ?string $annulation = null;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'event')]

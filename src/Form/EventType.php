@@ -41,7 +41,7 @@ class EventType extends AbstractType
                 'required' => false
             ])
             ->add('place', EntityType::class,[
-                'label' => 'lieu',
+                'label' => 'Lieu',
                 'class' => Place::class,
                 'choice_label' => 'name',
                 'placeholder'=>' --Choisissez un lieu pour la sortie-- ',
