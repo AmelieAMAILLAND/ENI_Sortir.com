@@ -6,8 +6,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
     let lat = place.latitude;
     let lon = place.longitude;
 
-    console.log(lat, lon);
-
     let map = L.map("map",{
         zoom: 10,
         center:[lat,lon]
@@ -19,24 +17,40 @@ document.addEventListener("DOMContentLoaded", (e) => {
         attribution: 'données © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
+    // récupération de la position de l'utilisateur
+    let originOSM = "";
+    let originGoogle = "";
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+
+            originOSM = `${userLat},${userLon}`;
+            originGoogle = `&origin=${userLat},${userLon}`;
+        }, (error) => {
+            console.error("Erreur de géolocalisation : ", error);
+        });
+    } else {
+        console.error("La géolocalisation n'est pas disponible sur ce navigateur.");
+    }
+
+    // affichage du marker et création de la popup
     let marker = L.marker([lat,lon]);
     let popup = `<div>
                             <div>
                                 <h2 class="text-lg text-center">${place.name}</h2>
                                 <p>${place.street}</p>
                                 <p>${place.zipCode} ${place.city}</p>
-                                <p><a href="https://www.openstreetmap.org/directions?engine=osrm_car&route=;${lat},${lon}" target="_blank" rel="noopener noreferrer" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">S'y rendre</a></p>
+                                <p>Pour s'y rendre :</p>
+                                <p><a href="https://www.openstreetmap.org/directions?engine=osrm_car&route=${originOSM};${lat},${lon}" target="_blank" rel="noopener noreferrer" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-go-osm">OpenStreetMap</a>
+                                <a href="https://www.google.com/maps/dir/?api=1${originGoogle}&destination=${lat},${lon}" target="_blank" rel="noopener noreferrer" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-go-google">Google</a></p>
                             </div>
                         </div>`;
     marker.bindPopup(popup).addTo(map);
     marker.on('popupopen', function() {
-        document.getElementById("go").addEventListener('click', (e) => {
-            e.preventDefault();
-
-
-        });
+        document.querySelector('.js-go-osm').href=`https://www.openstreetmap.org/directions?engine=osrm_car&route=${originOSM};${lat},${lon}`;
+        document.querySelector('.js-go-google').href=`https://www.google.com/maps/dir/?api=1${originGoogle}&destination=${lat},${lon}`;
     });
-
 });
 
 
