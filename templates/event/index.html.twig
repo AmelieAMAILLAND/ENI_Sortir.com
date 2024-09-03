@@ -5,12 +5,12 @@
 {% block body %}
     <h1 class="text-center text-3xl font-semibold my-3">Les sorties</h1>
 
-    <div class="vue-btn-container">
-        <button id="switch-vue-btn" class="py-1 px-2 rounded-md w-[120px] bg-red-200 fixed top-[120px] right-[20px]">Vue tableau</button>
+    <div class="vue-btn-container max-lg:hidden">
+        <button id="switch-vue-btn" class="py-1 px-2 rounded-md w-[120px] bg-red-200 fixed top-[120px] right-[20px] z-10">Vue tableau</button>
     </div>
 
     <div class="form-container mb-6 border border-slate-500 py-4 px-6 max-w-[1200px] mx-auto shadow-md rounded-md">
-        <form method="GET" class="filters-form flex justify-between">
+        <form method="GET" class="filters-form flex justify-between max-sm:flex-col max-sm:gap-3">
             <div class="filters-container flex flex-col gap-2 min-w-[50%]">
                 <div class="status-site-container flex gap-3 justify-between">
                     <div class="status-container">
@@ -32,11 +32,11 @@
                         </select>
                     </div>
                 </div>
-                <div class="name-container flex gap-2 items-center justify-center">
+                <div class="name-container flex gap-2 items-center justify-center max-sm:flex-col">
                     <label for="nameInput">Nom contenant </label>
                     <input type="text" name="nameInput" id="nameInput" placeholder="..." value="{{ filters.nameInput }}" class="flex-grow rounded-md">
                 </div>
-                <div class="dates-container flex justify-between items-center">
+                <div class="dates-container flex justify-between items-center max-sm:flex-col">
                     <label for="beginDate">Entre </label>
                     <input type="datetime-local" name="beginDate" id="beginDate" value="{{ filters.beginDate }}" class="js-date-input rounded-md">
                     <label for="endDate"> et </label>
