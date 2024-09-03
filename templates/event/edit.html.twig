@@ -46,11 +46,6 @@
                 <p>Lieu</p>
                 <input id="place-name" class="mt-1 mb-2 w-full" disabled value="{{ event.place.name }}">
                 <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Nouveau lieu</a>
-{#                {% if event.place %}#}
-{#                    <a href="{{ path('app_place_edit',{ 'id':event.place.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn" id="place-edit">Modifier</a>#}
-{#                {% else %}#}
-{#                    <a href="" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" id="place-edit">#}{#&#x270e;#}{#Modifier</a>#}
-{#                {% endif %}#}
                 <a href="#modal" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto modal-btn js-modal hover:opacity-80">Choisir</a>
             </div>
             <div>
@@ -65,7 +60,6 @@
 
                 {% do form.submit.setRendered %} {# pour les exclures du form_rest #}
                 {% do form.publish.setRendered %}
-{#                {% do form.place.setRendered %}#}
 
                 {{ form_rest(form) }} {# pour passer le token #}
 
@@ -82,6 +76,5 @@
     {{ parent() }}
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="{{ asset('JavaScript/eventEdit.js') }}"></script>
-    <script src="{{ asset('JavaScript/eventModal.js') }}"></script>
+    <script src="{{ asset('JavaScript/eventEdit.js') }}" type="module"></script>
 {% endblock %}
