@@ -34,14 +34,17 @@ class EventCrudController extends AbstractCrudController
                 ->setHelp('Le nom de l\'événement doit être unique et contenir entre 4 et 30 caractères'),
 
             DateTimeField::new('dateTimeStart', 'Date de début')
+                ->setFormat('dd/MM/yyyy HH:mm')
                 ->setRequired(true)
                 ->setHelp('La date et l\'heure de début de l\'événement'),
 
             DateTimeField::new('duration', 'Durée')
+                ->setFormat('HH:mm')
                 ->setRequired(false)
                 ->setHelp('Durée de l\'événement (optionnelle)'),
 
             DateTimeField::new('registrationDeadline', 'Date limite d\'inscription')
+                ->setFormat('dd/MM/yyyy HH:mm')
                 ->setRequired(true)
                 ->setHelp('La date limite pour s\'inscrire à l\'événement'),
 
@@ -77,11 +80,7 @@ class EventCrudController extends AbstractCrudController
                 ->setCrudController(UserCrudController::class)
                 ->hideOnForm() // Cache sur le formulaire car c'est une relation inversée
                 ->setHelp('Liste des utilisateurs inscrits à cet événement'),
-
-            TextareaField::new('annulation', 'Motif d\'annulation')
-                ->hideOnIndex()
-                ->setRequired(false)
-                ->setHelp('Motif de l\'annulation (optionnel)'),
+            
         ];
     }
 
