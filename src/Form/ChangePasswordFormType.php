@@ -27,25 +27,25 @@ class ChangePasswordFormType extends AbstractType
                 'first_options' => [
                     'constraints' => [
                         new NotBlank([
-                            'message' => 'Please enter a password',
+                            'message' => 'Le mot de passe est obligatoire',
                         ]),
-                        new Length([
-                            'min' => 12,
-                            'minMessage' => 'Your password should be at least {{ limit }} characters',
-                            'max' => 4096,
-                        ]),
-                        new PasswordStrength([
-                            'minScore' => 4, // Niveau de force minimum du mot de passe
-                            'message' => 'Your password is too weak. It must include a mix of letters, numbers, and special characters.',
-                        ]),
-                        new NotCompromisedPassword(),
+//                        new Length([
+//                            'min' => 12,
+//                            'minMessage' => 'Your password should be at least {{ limit }} characters',
+//                            'max' => 4096,
+////                        ]),
+//                        new PasswordStrength([
+//                            'minScore' => 1, // Niveau de force minimum du mot de passe
+//                            'message' => 'Your password is too weak. It must include a mix of letters, numbers, and special characters.',
+//                        ]),
+//                        new NotCompromisedPassword(),
                     ],
-                    'label' => 'New password',
+                    'label' => 'Nouveau mot de passe',
                 ],
                 'second_options' => [
-                    'label' => 'Repeat Password',
+                    'label' => 'Confirmer votre mot de passe',
                 ],
-                'invalid_message' => 'The password fields must match.',
+                'invalid_message' => 'Les 2 mots de passe doivent être identiques.',
                 'mapped' => false,
             ]);
     }

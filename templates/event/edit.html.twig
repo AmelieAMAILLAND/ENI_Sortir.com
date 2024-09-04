@@ -10,11 +10,8 @@
 
 {% block body %}
 
-    <div class="js-datas" data-places="{{ places }}" {% if event.id!= null %}data-current-event="{{ event|serialize(format='json') }}"{% endif %}></div>
-{#    <script>#}
-{#        const places = {{ places|raw }};#}
-{#        const currentEvent = {{ event }}#}
-{#    </script>#}
+    <div class="js-datas" data-places="{{ places }}" {% if event.id!= null %}data-current-event="{{ event|serialize('json', {'groups': ['events.edit']}) }}"{% endif %}></div>
+
     <aside id="modal" class="modal-container fixed top-0 left-0 w-screen h-screen bg-gray-500/75 hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="title-modal">
         <div class="overlay absolute w-full h-full bg-gray-500/75 js-close-modal"></div>
         <div class="modal w-11/12 max-w-2xl min-w-80 p-7 bg-white rounded absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
