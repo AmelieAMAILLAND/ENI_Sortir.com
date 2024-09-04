@@ -12,7 +12,7 @@ function collectInputsValues(){
 
     const vueParam = document.getElementById("js-vue-params").value;
 
-    console.log([statusAndSite, nameParam, beginAndEndDate, planner, checkedRegistered, vueParam]);
+   // console.log([statusAndSite, nameParam, beginAndEndDate, planner, checkedRegistered, vueParam]);
 
     return [statusAndSite, nameParam, beginAndEndDate, planner, checkedRegistered, vueParam];
 }
@@ -21,7 +21,7 @@ function collectInputsValues(){
 
 const userId = document.getElementById('js-user-id').textContent;
 const userPseudo = document.getElementById('js-user-pseudo').textContent;
- const isUserAnAdmin = !!document.getElementById('isAdmin');
+const isUserAnAdmin = !!document.getElementById('isAdmin');
 
 
 const parametersValues = collectInputsValues();
@@ -29,7 +29,7 @@ const parametersValues = collectInputsValues();
 function buildRequestUrlFromParams(parametersValues){
 
 
-    let baseUrl = `http://localhost:8000/api/events/${userId}/`;
+    let baseUrl = `/api/events`;
 
     let paramsString = `?status=${parametersValues[0][0]}&siteName=${parametersValues[0][1]}&nameInput=${parametersValues[1]}&beginDate=${parametersValues[2][0]}&endDate=${parametersValues[2][1]}${ parametersValues[3] ? '&isPlanner=on' : ''}&registered=${parametersValues[4]}&vue=${parametersValues[5]}`;
 
@@ -42,7 +42,12 @@ function buildRequestUrlFromParams(parametersValues){
 async function fetchEventAPI(url){
 
     try{
-        const response = await fetch(url);
+        const response = await fetch(url,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         let data = await response.json()
 
         //console.log("Avant filtre: ", data);
@@ -138,12 +143,12 @@ function buildEventTableHtml(event){
             
             <td class="td-style">${mapStatusToFrench(event.state)}</td>
             <td class="td-style flex justify-center items-center gap-1">
-                <a href="http://localhost:8000/event/${event.id}"
+                <a href="/event/${event.id}"
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
             ${userPseudo === event.planner.pseudo ? 
-            `<a href='http://localhost:8000/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
+            `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
                 
             </td>
             </tr>`;
@@ -188,7 +193,7 @@ function buildEventCardHtml(event){
                                 event.state === 'canceled' ? 'bg-gray-500 opacity-70' : ''}  ">
         <div class="name-and-date-container flex justify-between items-center">
             <p class="font-semibold text-xl hover:opacity-80">
-                <a href="http://localhost:8000/event/${event.id}">${event.name}</a>
+                <a href="/event/${event.id}">${event.name}</a>
             </p>
             <input type="datetime-local" value="${event.dateTimeStart.split('+')[0]}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">
         </div>
@@ -210,19 +215,19 @@ function buildEventCardHtml(event){
         <div class="desc-container">
             <p>${event.infoEvent}</p>
         </div>
-        <div class="org-container flex justify-between">
+        <div class="org-container flex justify-between mb-2">
 
-            <p>Organisateur : <a href="http://localhost:8000/profil/${event.planner.id}" class="font-semibold hover:opacity-80">${event.planner.pseudo}</a></p>
+            <p>Organisateur : <a href="/profil/${event.planner.id}" class="font-semibold hover:opacity-80 ">${event.planner.pseudo}</a></p>
             <p class="">${mapStatusToFrench(event.state)}</p>
 
         </div>
-        <div class="actions-container mx-auto max-w-fit mt-2">
-            <a href="http://localhost:8000/event/${event.id}"
+        <div class="actions-container mx-auto max-w-[30%] flex gap-3 ">
+            <a href="/event/${event.id}"
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
             ${userPseudo === event.planner.pseudo ?
-        `<a href='http://localhost:8000/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
+        `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
            
         </div>
 
@@ -273,7 +278,7 @@ async function fetchAndDisplay(){
 
     const events = await fetchEventAPI(url);
 
-    console.log(events);
+    //console.log(events);
 
     const tableContainer = document.querySelector('.js-table-container');
     const cardsContainer = document.querySelector('.js-cards-container');
@@ -313,7 +318,7 @@ const registeredButtons = [...document.querySelectorAll("input[name='registered'
 
 const filtersListeningChange = [...statusAndSiteInputs, nameFilterInput,...dateFilterInputs, planner, ...registeredButtons];
 
-console.log(filtersListeningChange)
+//console.log(filtersListeningChange)
 filtersListeningChange.forEach(input=>input.addEventListener('change', e=>fetchAndDisplay()));
 resetButton.addEventListener('click', e=>fetchAndDisplay())
 

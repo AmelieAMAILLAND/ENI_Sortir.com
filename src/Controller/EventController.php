@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Psr\Log\LoggerInterface;
 
+
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {
