@@ -37,6 +37,21 @@ class EventRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+
+    public function easyAdminFindAllEvents(){
+        return $this->createQueryBuilder('e')
+            ->select('e')
+            ->addselect('user')
+            ->addSelect('site')
+            ->addSelect('reg_user')
+            ->addSelect('place')
+            ->innerJoin('e.planner', 'user')
+            ->innerJoin('user.site', 'site')
+            ->innerJoin('e.place', 'place')
+            ->leftJoin('e.registered', 'reg_user');
+
+    }
+
     public function findWithMultipleFilters(filtersDTO $filtersDTO, $requester): array{
 
         $query = $this->createQueryBuilder('e')

@@ -38,7 +38,7 @@
                     <p>Organisé par <a href="{{ path('app_profil',{'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
                 </div>
             </div>
-            <div id="map" class="h-96 mb-2 md:w-3/5"></div>
+            <div id="map" class="h-96 mb-2 md:w-3/5 "></div>
         </div>
         <div class="w-full mb-2">
             <table class="w-full table-auto">
@@ -75,6 +75,7 @@
 
 {% endblock %}
 {% block javascripts %}
+    {{ parent() }}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="{{ asset('JavaScript/eventShow.js') }}"></script>
 {% endblock %}
