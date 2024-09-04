@@ -12,12 +12,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ApiEventController extends AbstractController
 {
 
-    #[Route('/api/events/{idUser}/', requirements: ['idUser' => '\d+'], methods: ['GET'])]
+    #[Route('/api/events', methods: ['GET'])]
     public function index(EventRepository $eventRepository,
-                              UserRepository $userRepository,
                               Request $request){
 
-        $user = $userRepository->find($request->get('idUser'));
+        $user = $this->getUser();
 
         $filtersDTO = new FiltersDTO(null,'all','all',null,null,null,null);
 

@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+
 #[Route('/event', name: 'app_event')]
 class EventController extends AbstractController
 {

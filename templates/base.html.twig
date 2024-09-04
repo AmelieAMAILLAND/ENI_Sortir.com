@@ -11,48 +11,58 @@
 
     {% block javascripts %}
         {#            {{ asset('JavaScript/profile.js') }}#}
+
+        <script src="{{ asset('JS/navbar.js') }}" defer></script>
     {% endblock %}
 </head>
 <body class="flex flex-col h-dvh relative">
 <header>
-    <nav class="bg-[#3d1a90] flex gap-3 justify-between fixed w-full z-10">
-        <a href="{{ path('app_home') }}">
-            <img src="{{ asset('images/logosortirok.png')}}" alt="LOGO" class="w-20">
+    <nav class="bg-[#3d1a90] flex gap-3 justify-between fixed w-full z-10 ">
+        <a href="{{ path('app_home') }}" aria-label="Page d'accueil">
+            <img src="{{ asset('images/logosortirok.png')}}" alt="" class="w-20">
         </a>
-        <ul class="px-3 flex gap-2 items-center">
+        <button id="menu-btn"
+                aria-label="Toggle button"
+                aria-expanded="false"
+                class="hidden max-sm:block">
+            <img src="{{ asset('images/menu.svg') }}" alt="" class="h-12 w-12">
+        </button>
+        <ul id="toggled-menu" class="px-3 flex gap-2 items-center transform-none transition-transform ease-in-out duration-300 z-10 max-sm:flex-col max-sm:gap-4 max-sm:absolute max-sm:top-0 max-sm:left-0  max-sm:-translate-y-full max-sm:-z-10 max-sm:text-black max-sm:justify-center max-sm:w-full max-sm:bg-[#3d1a90] max-sm:py-6 max-sm:h-[100vh]">
             {% if is_granted("ROLE_ADMIN")%}
-                <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="" class="lg:text-xl lg:font-bold">Villes</a>
                 </li>
-                <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="" class="lg:text-xl lg:font-bold">Sites</a>
                 </li>
             {% endif %}
 
-            <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+            <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                 <a href="{{ path('app_event_index') }}" class="lg:text-xl lg:font-bold">Sorties</a>
             </li>
 
             {% if is_granted('ROLE_USER') %}
-                <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('app_profil') }}" class="lg:text-xl lg:font-bold">Mon profil</a>
                 </li>
             {% endif %}
 
             {% if app.user is null %}
-                <li class="{{ app.current_route == 'app_login' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
+                <li class="{{ app.current_route == 'app_login' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('app_login') }}" class="lg:text-xl lg:font-bold">Se connecter</a>
                 </li>
             {% else %}
-                <li class="text-white hover:opacity-80">
+                <li class="text-white hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('app_logout') }}" class="lg:text-xl lg:font-bold">Se déconnecter</a>
                 </li>
             {% endif %}
         </ul>
+
     </nav>
 </header>
 
-<main class="flex-grow mt-[80px]">
+
+<main class="flex-grow mt-[80px] bg-slate-100">
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="text-red-600">{{ message }}</div>

@@ -3,7 +3,7 @@
 // PARTIE FIXE DONC PAS BESOIN DE REFRESH LES SELECTIONS
 
 //Gestion du bouton de réinitialisation
-const resetBtn = document.getElementById('reset-filters-btn');
+let resetBtn = document.getElementById('reset-filters-btn');
 
 const selectInputs = [...document.querySelectorAll('.js-select-input')];
 const nameInput = document.getElementById('nameInput');
@@ -35,7 +35,6 @@ const isAdmin = !!document.getElementById('isAdmin');
 stateInput.addEventListener('change', checkForPlannerCheckbox)
 
 function checkForPlannerCheckbox(e){
-    console.log(e);
     //Si l'utilisateur qui clique est admin, on ne coche/disable pas la checkbox.
     if(isAdmin){
         return;
@@ -107,5 +106,30 @@ function switchVue(e){
         return
     }
 }
+
+//Gestion de l'affichage des filtres en mode accordéon.
+
+const filtersToggler = document.querySelector('.toggle-container');
+const filtersContainer = document.querySelector('.form-container');
+
+const toggleImg = document.querySelector('.toggle-container img')
+
+filtersToggler.addEventListener('click', e=>toggleFilters());
+
+function toggleFilters(){
+
+    if(filtersContainer.classList.contains('hidden')){
+        toggleImg.setAttribute("src","/images/cross-black.svg")
+    }else{
+        toggleImg.setAttribute("src","/images/chevron-down.svg")
+    }
+
+    filtersContainer.classList.toggle('max-h-0')
+    filtersContainer.classList.toggle('overflow-hidden')
+    filtersContainer.classList.toggle('hidden')
+
+}
+
+toggleFilters();
 
 
