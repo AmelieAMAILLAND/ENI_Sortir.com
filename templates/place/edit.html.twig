@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Place{% endblock %}
+{% block title %}
+    {% if app.current_route=='app_place_new' %}Créer{% else %}Modifier{% endif %} un lieu
+{% endblock %}
 
 {% block body %}
 <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex flex-col">

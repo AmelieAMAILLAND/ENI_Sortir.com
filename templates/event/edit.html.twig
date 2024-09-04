@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Event{% endblock %}
+{% block title %}
+    {% if app.current_route=='app_event_new' %}Créer{% else %}Modifier{% endif %} une sortie
+{% endblock %}
 
 {% block stylesheets%}
     {{ parent() }}
