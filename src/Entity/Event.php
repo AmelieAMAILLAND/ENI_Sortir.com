@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -24,7 +25,7 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?int $id = null;
 
     /**
@@ -33,7 +34,7 @@ class Event
     #[ORM\Column(length: 30, unique: true)]
     #[Assert\NotBlank(message: "Nom de la sortie obligatoire")]
     #[Assert\Length(min: 4, max: 30, minMessage: "Il faut au moins {{ limit }} caractères", maxMessage: "Pas plus de {{ limit }} caractères")]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?string $name = null;
 
     /**
@@ -41,14 +42,14 @@ class Event
      */
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\GreaterThan('today', message:'La sortie doit avoir lieu après l\'instant présent.')]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?\DateTimeInterface $dateTimeStart = null;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?\DateTimeInterface $duration = null;
 
     /**
@@ -56,7 +57,7 @@ class Event
      */
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\LessThan(propertyPath: 'dateTimeStart', message: 'On ne doit pas pouvoir s\'inscrire après le début de la sortie.')]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?\DateTimeInterface $registrationDeadline = null;
 
     /**
@@ -65,14 +66,14 @@ class Event
     #[ORM\Column]
     #[Assert\Positive(message: 'Un nombre de participants négatif, vraiment ?')]
     #[Assert\LessThan(1000000, message: 'Il n\'y aura pas assez de place !')]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?int $maxNbRegistration = null;
 
     /**
      * @var string|null
      */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?string $infoEvent = null;
 
     /**
@@ -80,7 +81,7 @@ class Event
      */
     #[ORM\Column(length: 30)]
     #[Assert\NotBlank(message: 'Vous n\'avez pas renseigné d\'état')]
-    #[Groups(['events.index'])]
+    #[Groups(['events.index','events.edit'])]
     private ?string $state = null;
 
     /**

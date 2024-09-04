@@ -104,15 +104,6 @@ class ResetPasswordController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('plainPassword')->getData();
-            $confirmPassword = $form->get('confirmPassword')->getData();
-
-            // Vérifiez si les mots de passe correspondent
-            if ($plainPassword !== $confirmPassword) {
-                $this->addFlash('reset_password_error', 'Les mots de passe ne correspondent pas.');
-                return $this->render('reset_password/reset.html.twig', [
-                    'resetForm' => $form,
-                ]);
-            }
 
             // Utilisez le hasher de mots de passe pour encoder le mot de passe
             $encodedPassword = $passwordHasher->hashPassword(
