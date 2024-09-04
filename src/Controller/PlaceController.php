@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Place;
 use App\Form\PlaceType;
 use App\Repository\PlaceRepository;
+use App\Service\CallApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ class PlaceController extends AbstractController
     }
 
     #[Route('/new', name: 'app_place_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, CallApiService $apiService): Response
     {
         $currentUrl = $request->getUri();
         $referer = $request->headers->get('referer');
@@ -33,10 +34,23 @@ class PlaceController extends AbstractController
         }
 
         $place = new Place();
+        $place->setLatitude(0);
+        $place->setLongitude(0);
         $form = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $adress=str_replace(' ','+',trim($place->getStreet())).'+'.str_replace(' ','+',trim($place->getCity()));
+            $coordinates = $apiService->getCoordinates($adress);
+            if (!$coordinates){
+                $this->addFlash('danger', 'Adresse inconnue. Veuillez vérifier l\'orthographe et l\'ensemble des champs ou trouver un lieu proche.');
+                return $this->render('place/edit.html.twig', [
+                    'place' => $place,
+                    'form' => $form,
+                ]);
+            }
+            $place->setLatitude($coordinates['lat']);
+            $place->setLongitude($coordinates['lon']);
             $entityManager->persist($place);
             $entityManager->flush();
 
@@ -62,7 +76,7 @@ class PlaceController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_place_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Place $place, EntityManagerInterface $entityManager, SessionInterface $session): Response
+    public function edit(Request $request, Place $place, EntityManagerInterface $entityManager, SessionInterface $session, CallApiService $apiService): Response
     {
         $currentUrl = $request->getUri();
         $referer = $request->headers->get('referer');
@@ -74,6 +88,17 @@ class PlaceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $adress=str_replace(' ','+',trim($place->getStreet())).'+'.str_replace(' ','+',trim($place->getCity()));
+            $coordinates = $apiService->getCoordinates($adress);
+            if (!$coordinates){
+                $this->addFlash('danger', 'Adresse inconnue. Veuillez vérifier l\'orthographe et l\'ensemble des champs ou trouver un lieu proche.');
+                return $this->render('place/edit.html.twig', [
+                    'place' => $place,
+                    'form' => $form,
+                ]);
+            }
+            $place->setLatitude($coordinates['lat']);
+            $place->setLongitude($coordinates['lon']);
             $entityManager->flush();
 
             $newPlaceId = $place->getId();
@@ -99,4 +124,5 @@ class PlaceController extends AbstractController
 
         return $this->redirectToRoute('app_place_index', [], Response::HTTP_SEE_OTHER);
     }
+
 }

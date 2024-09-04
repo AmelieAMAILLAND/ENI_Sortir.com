@@ -25,12 +25,12 @@ class PlaceType extends AbstractType
             ->add('city', null, [
                 'label' => 'Ville',
             ])
-            ->add('latitude', null, [
+            /*->add('latitude', null, [
                 'label' => 'Latitude',
             ])
             ->add('longitude', null, [
                 'label' => 'Longitude',
-            ])
+            ])*/
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'row_attr'=>[

@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 #[Route('/event', name: 'app_event')]
@@ -67,15 +68,13 @@ class EventController extends AbstractController
 
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session, SerializerInterface $serializer): Response
     {
         $event = new Event();
-        /*$savedData = $session->get('event_form_data');
+        $event->setPlanner($this->getUser());
+        $event->setState('created');
 
-        if ($savedData) {
-            $event = $savedData;
-            $session->remove('event_form_data');
-        }*/
+        $places = $serializer->serialize($placeRepository->findAll(), 'json');
 
         $newPlaceId = $request->query->get('newPlaceId');
         if ($newPlaceId) {
@@ -101,6 +100,7 @@ class EventController extends AbstractController
         }
         return $this->render('event/edit.html.twig', [
             'event' => $event,
+            'places' => $places,
             'form' => $form,
         ]);
     }
@@ -128,13 +128,16 @@ class EventController extends AbstractController
 
 
     #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository): Response
+    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SerializerInterface $serializer): Response
     {
         if (!$event){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il n\'existe pas');
             return $this->redirectToRoute('app_event_index');
         }
         $owner = $event->getPlanner();
+
+        $places = $serializer->serialize($placeRepository->findAll(), 'json');
+
         if ($owner === $this->getUser() && ($event->getState() === 'created' || $event->getState() === 'published')) {
             $newPlaceId = $request->query->get('newPlaceId');
             if ($newPlaceId) {
@@ -160,6 +163,7 @@ class EventController extends AbstractController
 
             return $this->render('event/edit.html.twig', [
                 'event' => $event,
+                'places' => $places,
                 'form' => $form,
             ]);
         } elseif ($owner !== $this->getUser()) {
@@ -268,4 +272,5 @@ class EventController extends AbstractController
         $entityManager->flush();
         return $this->redirectToRoute('app_event_show', ['id'=>$event->getId()]);
     }
+
 }
