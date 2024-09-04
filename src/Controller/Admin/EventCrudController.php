@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Event;
+use App\Service\EmailService;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EventRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -10,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -21,12 +24,21 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventCrudController extends AbstractCrudController
 {
 
-    public function __construct(EventRepository $eventRepository){
+    private EmailService $emailService;
+
+    public function __construct()
+    {
+       
+    public function __construct(EventRepository $eventRepository, EmailService $emailService){
         $this->eventRepository = $eventRepository;
+        $this->emailService = $emailService;
+
     }
 
     public static function getEntityFqcn(): string
@@ -97,8 +109,63 @@ class EventCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+
+        // Crée une nouvelle action pour annuler un événement
+        $cancelEvent = Action::new('cancelEventForm', 'Annuler')
+            ->linkToCrudAction('cancelEventForm') // Lien vers l'action CRUD qui affiche le formulaire
+            ->setCssClass('btn-secondary');
+
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL); // Ajoute une action de détail sur la page d'index
+            ->add(Crud::PAGE_INDEX, $cancelEvent)   // Afficher le bouton "Annuler" sur la page d'index
+            ->add(Crud::PAGE_DETAIL, $cancelEvent)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
+
+    public function cancelEventForm(AdminContext $context): Response
+    {
+        $event = $context->getEntity()->getInstance();
+
+        // Rendre le formulaire Twig pour saisir le motif d'annulation
+        return $this->render('admin/event_cancel_form.html.twig', [
+            'event' => $event
+        ]);
+    }
+
+    public function confirmCancel(AdminContext $context, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $event = $context->getEntity()->getInstance();
+        $motifAnnulation = $request->request->get('motif_annulation');
+
+        if (!$motifAnnulation) {
+            $this->addFlash('danger', 'Le motif d\'annulation est obligatoire.');
+            return $this->render('admin/event_cancel_form.html.twig', [
+                'event' => $event,
+            ]);
+        }
+
+        // Enregistrer l'état annulé et le motif d'annulation
+        $event->setState('cancelled');
+        $event->setAnnulation($motifAnnulation);
+        $entityManager->flush();
+
+        // Envoi des e-mails aux participants
+        $participants = $event->getRegistered(); // Récupère les utilisateurs inscrits à l'événement
+
+        foreach ($participants as $participant) {
+            $this->emailService->sendCancellationEmail(
+                $participant->getEmail(),        // Email du participant
+                $event->getName(),               // Nom de l'événement
+                $motifAnnulation                 // Motif d'annulation
+            );
+        }
+
+        // Message de succès
+        $this->addFlash('success', 'L\'événement a été annulé avec succès et les participants ont été informés.');
+
+        return $this->redirect($this->generateUrl('admin', [
+            'crudAction' => 'index',
+            'crudControllerFqcn' => EventCrudController::class,
+        ]));
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto,
