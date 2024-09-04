@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             target.classList.add('hidden');
             target.setAttribute('aria-hidden', true);
             target.removeAttribute('aria-modal');
+            setCurrentPlaceName();
             document.querySelectorAll('.js-close-modal').forEach(btn => {
                 btn.removeEventListener("click", closeModal);
             })
@@ -77,8 +78,9 @@ document.addEventListener("DOMContentLoaded", (e) => {
     })
 
     // Affichage de la carte
-    let lat = 0;
-    let lon = 0;
+    let lat = 47.22650646550442;
+    let lon = -1.6206925419923897;
+
     const currentPlaceName = document.getElementById('place-name');
     const currentPlace = document.getElementById('event_place')
 
@@ -110,7 +112,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
                                     <h2 class="text-lg text-center">${place.name}</h2>
                                     <p>${place.street}</p>
                                     <p>${place.zipCode} ${place.city}</p>
-                                    <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Modifier</a> <button id="chose-place-${place.id}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Sélectionner</button></p>
+                                    <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Modifier</a> 
+                                    <button id="chose-place-${place.id}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Sélectionner</button></p>
                                 </div>
                             </div>`;
         marker.bindPopup(popup).addTo(map);
@@ -118,7 +121,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             document.getElementById(`chose-place-${place.id}`).addEventListener('click', (e) => {
                 e.preventDefault();
                 currentPlaceName.value = place.name;
-                currentEvent.place=place;
+                // currentEvent.place=place;
                 currentPlace.value=place.id;
                 console.log(currentEvent);
                 closeModal(e);
@@ -130,6 +133,10 @@ document.addEventListener("DOMContentLoaded", (e) => {
             })
         });
     })
+
+    const setCurrentPlaceName=() => {
+        currentPlaceName.value =currentEvent.place.name;
+    }
 });
 
 

@@ -71,13 +71,13 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session, SerializerInterface $serializer): Response
     {
         $event = new Event();
         $event->setPlanner($this->getUser());
         $event->setState('created');
 
-        $places = $placeRepository->findAll();
+        $places = $serializer->serialize($placeRepository->findAll(), 'json');
 
         $newPlaceId = $request->query->get('newPlaceId');
         if ($newPlaceId) {

@@ -48,15 +48,15 @@ class EventType extends AbstractType
             ])
             ->add('submit', SubmitType::class,[
                 'label'=>'Enregistrer',
-                'row_attr'=>[
-                    'class'=>'bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80'
-                ],
+//                'row_attr'=>[
+//                    'class'=>'bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80'
+//                ],
             ])
             ->add('publish', SubmitType::class,[
                 'label'=>'Publier la sortie',
-                'row_attr'=>[
-                    'class'=>'bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80'
-                ],
+//                'row_attr'=>[
+//                    'class'=>'bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80'
+//                ],
             ]);
     }
 
