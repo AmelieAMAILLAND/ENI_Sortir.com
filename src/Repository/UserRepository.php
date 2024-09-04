@@ -45,6 +45,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
 
+    public function easyAdminFindAllUsers()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->addSelect('site')
+            ->innerJoin('u.site', 'site');
+    }
+
 
     //    /**
     //     * @return User[] Returns an array of User objects
