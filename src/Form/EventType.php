@@ -46,9 +46,11 @@ class EventType extends AbstractType
             ])
             ->add('submit', SubmitType::class,[
                 'label'=>'Enregistrer',
+                'attr' => ['title' => 'Enregistre les modifications apportées à la sortie']
             ])
             ->add('publish', SubmitType::class,[
                 'label'=>'Publier la sortie',
+                'attr' => ['title' => 'Enregistre les modifications apportées à la sortie et la publie']
             ]);
     }
 
