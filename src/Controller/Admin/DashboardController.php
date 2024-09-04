@@ -23,10 +23,10 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         return [
+            MenuItem::linkToRoute('Retour à l\'accueil', 'fas fa-home', 'app_home'),
             MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class),
             MenuItem::linkToCrud('Sites', 'fas fa-building', Site::class),
-            MenuItem::linkToCrud('Evènements', 'fas fa-building', Event::class),
-
+            MenuItem::linkToCrud('Evènements', 'fas fa-calendar-alt', Event::class),
         ];
     }
 }

@@ -29,11 +29,8 @@
         </button>
         <ul id="toggled-menu" class="px-3 flex gap-2 items-center transform-none transition-transform ease-in-out duration-300 z-10 max-sm:flex-col max-sm:gap-4 max-sm:absolute max-sm:top-0 max-sm:left-0  max-sm:-translate-y-full max-sm:-z-10 max-sm:text-black max-sm:justify-center max-sm:w-full max-sm:bg-[#3d1a90] max-sm:py-6 max-sm:h-[100vh]">
             {% if is_granted("ROLE_ADMIN")%}
-                <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
-                    <a href="" class="lg:text-xl lg:font-bold">Villes</a>
-                </li>
-                <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
-                    <a href="" class="lg:text-xl lg:font-bold">Sites</a>
+                <li class="{{ app.current_route == 'admin_dashboard' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="{{ path('admin_dashboard') }}" class="lg:text-xl lg:font-bold">Admin</a>
                 </li>
             {% endif %}
 
