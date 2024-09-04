@@ -1,67 +1,77 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% endblock %}
 
-        {% block javascripts %}
-{#            {{ asset('JavaScript/profile.js') }}#}
-        {% endblock %}
-    </head>
-    <body class="flex flex-col h-dvh">
-    <header>
-        <nav class="bg-blue-950 flex gap-3 justify-between fixed w-full z-10">
-            <a href="{{ path('app_home') }}">
-                <img src="{{ asset('images/logosortirok.png')}}" alt="LOGO" class="w-20">
-            </a>
-            <ul class="px-3 flex gap-2 items-center">
-                {% if is_granted("ROLE_ADMIN")%}
-                    <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                        <a href="">Villes</a>
-                    </li>
-                    <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                        <a href="">Sites</a>
-                    </li>
-                {% endif %}
+    {% block javascripts %}
+        {#            {{ asset('JavaScript/profile.js') }}#}
 
-                <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                    <a href="{{ path('app_event_index') }}">Sorties</a>
+        <script src="{{ asset('JS/navbar.js') }}" defer></script>
+    {% endblock %}
+</head>
+<body class="flex flex-col h-dvh relative">
+<header>
+    <nav class="bg-[#3d1a90] flex gap-3 justify-between fixed w-full z-10 ">
+        <a href="{{ path('app_home') }}" aria-label="Page d'accueil">
+            <img src="{{ asset('images/logosortirok.png')}}" alt="" class="w-20">
+        </a>
+        <button id="menu-btn"
+                aria-label="Toggle button"
+                aria-expanded="false"
+                class="hidden max-sm:block">
+            <img src="{{ asset('images/menu.svg') }}" alt="" class="h-12 w-12">
+        </button>
+        <ul id="toggled-menu" class="px-3 flex gap-2 items-center transform-none transition-transform ease-in-out duration-300 z-10 max-sm:flex-col max-sm:gap-4 max-sm:absolute max-sm:top-0 max-sm:left-0  max-sm:-translate-y-full max-sm:-z-10 max-sm:text-black max-sm:justify-center max-sm:w-full max-sm:bg-[#3d1a90] max-sm:py-6 max-sm:h-[100vh]">
+            {% if is_granted("ROLE_ADMIN")%}
+                <li class="{{ app.current_route == 'villes' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="" class="lg:text-xl lg:font-bold">Villes</a>
                 </li>
+                <li class="{{ app.current_route == 'sites' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="" class="lg:text-xl lg:font-bold">Sites</a>
+                </li>
+            {% endif %}
 
-                {% if is_granted('ROLE_USER') %}
-                    <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                        <a href="{{ path('app_profil') }}">Mon profil</a>
-                    </li>
-                {% endif %}
+            <li class="{{ app.current_route starts with 'app_event_' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                <a href="{{ path('app_event_index') }}" class="lg:text-xl lg:font-bold">Sorties</a>
+            </li>
 
-                {% if app.user is null %}
-                    <li class="{{ app.current_route == 'app_login' ? 'text-amber-300' : 'text-white' }} hover:opacity-80">
-                        <a href="{{ path('app_login') }}">Se connecter</a>
-                    </li>
-                {% else %}
-                    <li class="text-white hover:opacity-80">
-                        <a href="{{ path('app_logout') }}">Se déconnecter</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </header>
+            {% if is_granted('ROLE_USER') %}
+                <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="{{ path('app_profil') }}" class="lg:text-xl lg:font-bold">Mon profil</a>
+                </li>
+            {% endif %}
 
-    <main class="flex-grow mt-[80px]">
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="text-red-600">{{ message }}</div>
-            {% endfor %}
+            {% if app.user is null %}
+                <li class="{{ app.current_route == 'app_login' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="{{ path('app_login') }}" class="lg:text-xl lg:font-bold">Se connecter</a>
+                </li>
+            {% else %}
+                <li class="text-white hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                    <a href="{{ path('app_logout') }}" class="lg:text-xl lg:font-bold">Se déconnecter</a>
+                </li>
+            {% endif %}
+        </ul>
+
+    </nav>
+</header>
+
+
+<main class="flex-grow mt-[80px] bg-slate-100">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="text-red-600">{{ message }}</div>
         {% endfor %}
-        {% block body %}{% endblock %}
-    </main>
-    <footer class="h-10 bg-blue-950">
-        <p class="py-2 text-center text-white">© SORTIR 2024</p>
-    </footer>
-    </body>
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+<footer class="h-10 bg-[#3d1a90]">
+    <p class="lg:text-2xl py-2 text-center text-white">© SORTIR 2024</p>
+</footer>
+</body>
 </html>
