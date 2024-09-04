@@ -1,4 +1,4 @@
-<form method="post" action="{{ path('app_event_cancel', {'id': event.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette sortie ?\nCette action est irréversible.');">
+<form method="post" action="{{ path('app_event_cancel', {'id': event.id}) }}">
     <input type="hidden" name="cancel_token" value="{{ csrf_token('cancel' ~ event.id) }}">
-    <button class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80" >Annuler la sortie</button>
+    <button class="bg-amber-600 rounded-md py-1 px-2 mb-2 max-w-fit mx-auto hover:opacity-80" title="Annule la sortie">Annuler la sortie</button>
 </form>
