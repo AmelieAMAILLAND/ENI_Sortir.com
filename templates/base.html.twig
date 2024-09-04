@@ -27,7 +27,7 @@
                 class="hidden max-sm:block">
             <img src="{{ asset('images/menu.svg') }}" alt="" class="h-12 w-12">
         </button>
-        <ul id="toggled-menu" class="px-3 flex gap-2 items-center transform-none transition-transform ease-in-out duration-300 z-10 max-sm:flex-col max-sm:gap-4 max-sm:absolute max-sm:top-0 max-sm:left-0  max-sm:-translate-y-full max-sm:-z-10 max-sm:text-black max-sm:justify-center max-sm:w-full max-sm:bg-[#3d1a90] max-sm:py-6 max-sm:h-[100vh]">
+        <ul id="toggled-menu" class="px-3 flex gap-2 items-center transform-none z-10 max-sm:flex-col max-sm:gap-4 max-sm:absolute max-sm:top-0 max-sm:left-0  max-sm:-translate-y-full max-sm:-z-10 max-sm:text-black max-sm:justify-center max-sm:w-full max-sm:bg-[#3d1a90] max-sm:py-6 max-sm:h-[100vh]">
             {% if is_granted("ROLE_ADMIN")%}
                 <li class="{{ app.current_route == 'admin_dashboard' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('admin_dashboard') }}" class="lg:text-xl lg:font-bold">Admin</a>
@@ -39,7 +39,7 @@
             </li>
 
             {% if is_granted('ROLE_USER') %}
-                <li class="{{ app.current_route == 'app_monProfile' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                <li class="{{ app.current_route == 'app_profil' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('app_profil') }}" class="lg:text-xl lg:font-bold">Mon profil</a>
                 </li>
             {% endif %}
@@ -62,7 +62,7 @@
 <main class="flex-grow mt-[80px] bg-slate-100">
     {% for label, messages in app.flashes %}
         {% for message in messages %}
-            <div class="text-red-600">{{ message }}</div>
+            <div class="mt-4 text-center text-white font-semibold bg-red-600 border border-red-600 py-4 px-3 rounded-md">{{ message }}</div>
         {% endfor %}
     {% endfor %}
     {% block body %}{% endblock %}

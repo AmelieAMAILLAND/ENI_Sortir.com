@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1 class="mt-10 text-3xl text-red-600 text-center">La page demandée n'existe pas ...</h1>
+
+    <div class="error-infos mt-5">
+        <p class="text-center text-xl font-semibold">{{ status_code }}</p>
+    </div>
+
+    <a href="{{ path('app_home') }}" class="mt-5 block w-fit py-2 px-4 mx-auto rounded-md bg-amber-500 text-white hover:opacity-80">Retourner à l'accueil</a>
+
+{% endblock %}

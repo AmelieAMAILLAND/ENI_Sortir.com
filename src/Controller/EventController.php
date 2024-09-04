@@ -109,13 +109,23 @@ class EventController extends AbstractController
     public function show(EventRepository $eventRepository, int $id): Response
     {
         $event=$eventRepository->findByIdWithRegistered($id);
+        //dd($event);
 
-        if (!$event || $event->getState() === 'created') {
+        $user = $this->getUser();
+
+        //Si on est admin, on passe peu importe l'état.
+        if(in_array('ROLE_ADMIN',$this->getUser()->getRoles())){
+            return $this->render('event/show.html.twig', [
+                'event' => $event,
+            ]);
+        }
+
+        if (!$event || ($event->getState() === 'created' && $event->getPlanner()->getId() !== $user->getId())) {
             $this->addFlash('danger', 'Cette sortie n\'est pas visible' );
             return $this->redirectToRoute('app_event_index');
         }
-        $now = new \DateTime();
-        if ($now > $event->getDateTimeStart()->add(new DateInterval('P1M'))){
+
+        if ($event->getState() === 'archived' && $event->getPlanner()->getId() !== $user->getId()){
             $this->addFlash('danger', 'Cette sortie est archivée' );
             return $this->redirectToRoute('app_event_index');
         }
