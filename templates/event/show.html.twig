@@ -57,10 +57,16 @@
             </div>
             <div id="map" class="h-96 w-full mb-2"></div>
         </div>
-        {% if event.state == 'published' %}
+        {% if (event.state == 'published') %}
             {% if app.user not in event.registered %}
                 <a href="{{ path('app_event_register',{ 'id':event.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">S'inscrire</a>
             {% else %}
+                <a href="{{ path('app_event_unregister',{ 'id':event.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Se désister</a>
+            {% endif %}
+        {% endif %}
+
+        {% if (event.state == 'full')%}
+            {% if app.user in event.registered %}
                 <a href="{{ path('app_event_unregister',{ 'id':event.id}) }}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Se désister</a>
             {% endif %}
         {% endif %}

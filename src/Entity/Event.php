@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Listeners\EventListener;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,9 +10,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\EntityListeners([EventListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity('name')]
 class Event
@@ -19,6 +22,7 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     #[ORM\Column(length: 30, unique: true)]
