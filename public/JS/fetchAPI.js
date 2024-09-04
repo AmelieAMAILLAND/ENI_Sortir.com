@@ -55,7 +55,7 @@ async function fetchEventAPI(url){
         //On remet le dernier filtre sur l'affichage des éléments 'archived' si on n'est pas admin OU pas l'organisateur.
 
         if(!isUserAnAdmin){
-            data = data.filter(event => (event.state !== 'archived') || (event.state='archived' && event.planner.pseudo === userPseudo))
+            data = data.filter(event => (event.state !== 'archived') || (event.state==='archived' && event.planner.pseudo === userPseudo))
         }
 
        // console.log("Après filtre: ", data);
@@ -147,14 +147,14 @@ function buildEventTableHtml(event){
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
-            ${userPseudo === event.planner.pseudo ? 
+            ${(userPseudo === event.planner.pseudo && event.state !== 'archived') ? 
             `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
                 
             </td>
             </tr>`;
 
-    //console.log(event);
-    //onsole.log(`Evènement : ${event.name}`,event.registered.find(user => user.id === userId), userId)
+
+    //console.log(`Evènement : ${event.name}`,event.registered.find(user => user.id === userId), userId)
     return eventHtml;
 }
 
@@ -218,7 +218,7 @@ function buildEventCardHtml(event){
         <div class="org-container flex justify-between mb-2">
 
             <p>Organisateur : <a href="/profil/${event.planner.id}" class="font-semibold hover:opacity-80 ">${event.planner.pseudo}</a></p>
-            <p class="">${mapStatusToFrench(event.state)}</p>
+            <p class="font-semibold">${mapStatusToFrench(event.state)}</p>
 
         </div>
         <div class="actions-container mx-auto max-w-[30%] flex gap-3 ">
@@ -226,7 +226,7 @@ function buildEventCardHtml(event){
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
-            ${userPseudo === event.planner.pseudo ?
+            ${(userPseudo === event.planner.pseudo && event.state !== 'archived') ?
         `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
            
         </div>
@@ -257,7 +257,7 @@ function mapStatusToFrench(status){
         case 'full':
             frenchStatus =  'Complète';
             break;
-        case 'archived':
+        case "archived":
             frenchStatus =  'Archivée';
             break;
         case 'closed':
