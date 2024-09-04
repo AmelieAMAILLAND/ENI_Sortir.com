@@ -3,7 +3,7 @@
 // PARTIE FIXE DONC PAS BESOIN DE REFRESH LES SELECTIONS
 
 //Gestion du bouton de réinitialisation
-const resetBtn = document.getElementById('reset-filters-btn');
+let resetBtn = document.getElementById('reset-filters-btn');
 
 const selectInputs = [...document.querySelectorAll('.js-select-input')];
 const nameInput = document.getElementById('nameInput');
@@ -35,7 +35,6 @@ const isAdmin = !!document.getElementById('isAdmin');
 stateInput.addEventListener('change', checkForPlannerCheckbox)
 
 function checkForPlannerCheckbox(e){
-    console.log(e);
     //Si l'utilisateur qui clique est admin, on ne coche/disable pas la checkbox.
     if(isAdmin){
         return;
@@ -114,8 +113,6 @@ const filtersToggler = document.querySelector('.toggle-container');
 const filtersContainer = document.querySelector('.form-container');
 
 const toggleImg = document.querySelector('.toggle-container img')
-
-console.log(filtersContainer, filtersToggler)
 
 filtersToggler.addEventListener('click', e=>toggleFilters());
 
