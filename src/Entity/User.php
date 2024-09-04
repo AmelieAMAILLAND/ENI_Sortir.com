@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['events.index'])]
     private ?int $id = null;
 
@@ -45,7 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message:'Mot de passe obligatoire.')]
+    #[Assert\NotBlank(message: 'Mot de passe obligatoire.', groups: ['AdminCreation'])]
 //    #[Assert\PasswordStrength([
 //        'minScore' => PasswordStrength::STRENGTH_WEAK,
 //        'message' => 'Votre mot de passe est trop faible'
@@ -88,6 +88,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ResetPasswordRequest::class, cascade: ['remove'])]
+    private $resetPasswordRequests;
+
     /**
      * @var Collection<int, Event>
      */
@@ -120,9 +123,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->plannedEvents = new ArrayCollection();
         $this->registeredFor = new ArrayCollection();
+        $this->resetPasswordRequests = new ArrayCollection();
     }
   
     // Getters et Setters 
+
+    public function getResetPasswordRequests(): Collection
+    {
+        return $this->resetPasswordRequests;
+    }
 
     /**
      * @return int|null
