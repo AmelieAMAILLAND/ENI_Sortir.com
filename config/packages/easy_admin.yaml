@@ -1,0 +1,7 @@
+# config/packages/easy_admin.yaml
+
+easy_admin:
+  # Vous pouvez configurer ici vos entités pour EasyAdmin
+  entities:
+    - App\Entity\User
+    - App\Entity\Event
