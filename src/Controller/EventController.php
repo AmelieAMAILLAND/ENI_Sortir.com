@@ -41,6 +41,10 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
 
+        $sites = $siteRepository->findAll();
+
+        //dd($user, $sites);
+
         $filtersDTO = new FiltersDTO(null,$user->getSite()->getName(),'Ouverte',null,null,null,null);
 
         $filters = $request->query->all();
@@ -54,7 +58,6 @@ class EventController extends AbstractController
 
         $statusArray = ['Ouverte', 'Complète', 'Passée', 'Fermée', 'Créée', 'Annulée', 'Archivée'];
 
-        $sites = $siteRepository->findAll();
 
         //Les évènements sont maintenant appelés en AJAX au chargement de la page et à chaque changement dans les filtres.
         return $this->render('event/index.html.twig', [
@@ -106,10 +109,10 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}', name: '_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(EventRepository $eventRepository, int $id): Response
+    public function show(Request $request, EventRepository $eventRepository, int $id, SessionInterface $session): Response
     {
-        $event=$eventRepository->findByIdWithRegistered($id);
-        //dd($event);
+
+        $event=$eventRepository->findByIdWithEveryField($id);
 
         $user = $this->getUser();
 
@@ -138,8 +141,26 @@ class EventController extends AbstractController
 
 
     #[Route('/{id}/edit', name: '_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function edit(Request $request, ?Event $event, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SerializerInterface $serializer): Response
+    public function edit(Request $request,
+                         int $id,
+                         SessionInterface $session,
+                         EntityManagerInterface $entityManager,
+                         PlaceRepository $placeRepository,
+                         SerializerInterface $serializer,
+                        EventRepository $eventRepository): Response
     {
+        $event = $eventRepository->findByIdWithEveryField($id);
+
+
+        $referer = $request->headers->get('referer');
+
+        if($referer !== 'http://localhost:8000/place/new'){
+            $session->set('previous_back_url', $referer);
+        }
+
+        $previousUrl = $session->get('previous_back_url');
+
+
         if (!$event){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il n\'existe pas');
             return $this->redirectToRoute('app_event_index');
@@ -175,6 +196,7 @@ class EventController extends AbstractController
                 'event' => $event,
                 'places' => $places,
                 'form' => $form,
+                'backLink'=>$previousUrl
             ]);
         } elseif ($owner !== $this->getUser()) {
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur');
@@ -184,6 +206,8 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_event_index');
         }
     }
+
+
 
     #[Route('/{id}', name: '_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response

@@ -78,4 +78,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findWithSiteById(int $id)
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u')
+            ->addSelect('site')
+            ->innerJoin('u.site', 'site')
+            ->where('u.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

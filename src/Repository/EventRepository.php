@@ -38,6 +38,23 @@ class EventRepository extends ServiceEntityRepository
     }
 
 
+    public function findByIdWithEveryField(int $id): ?Event{
+
+        return $this->createQueryBuilder('e')
+            ->addSelect('user')
+            ->addSelect('planner')
+            ->addSelect('place')
+            ->leftJoin('e.registered', 'user')
+            ->innerJoin('e.planner','planner')
+            ->innerJoin('e.place','place')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
+
     public function easyAdminFindAllEvents(){
         return $this->createQueryBuilder('e')
             ->select('e')
@@ -72,15 +89,18 @@ class EventRepository extends ServiceEntityRepository
                         //On met pas de préfiltre sur les évènements, on les voit TOUS
                         $query->groupBy('e.id, user.id, site.id, reg_user.id');
                     }else{
-                        $query->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo)')
+                        $now = (new \DateTime())->modify('+2 hours');
+                        $nowMinusOneMonth = (clone $now)->modify('-1 month');
+
+                        $query->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo) OR ( user.pseudo = :requesterPseudo AND (e.dateTimeStart < :oneMonthAgo AND e.state = :published))')
                         ->setParameter('published', 'published')
+                            ->setParameter('oneMonthAgo', $nowMinusOneMonth)
                         ->setParameter('otherState', ['canceled','created'])
                         ->setParameter('requesterPseudo', $requester->getPseudo())
-        //                ->setParameter('states', ['published','created']) // Premier filtre afficher que les états 'published' (en BDD que 'created', 'published' et 'canceled' donc OK)
+
+
                         ->groupBy('e.id, user.id, site.id, reg_user.id');
                     }
-
-
 
             if($filtersDTO->status != 'all'){
 
@@ -206,6 +226,7 @@ class EventRepository extends ServiceEntityRepository
                         ->setParameter('regUserPseudo', $requester->getPseudo());
                 }
             }
+            //dd($query->getQuery());
             return $query->getQuery()->getResult();
     }
 
