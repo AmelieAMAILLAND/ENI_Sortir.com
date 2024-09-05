@@ -40,4 +40,10 @@ class SiteRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function getAllSites(): array{
+        return $this->createQueryBuilder('s')
+            ->getQuery()
+            ->getResult();
+}
 }

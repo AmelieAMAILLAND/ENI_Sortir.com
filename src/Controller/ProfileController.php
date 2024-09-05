@@ -11,6 +11,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,13 +20,28 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ProfileController extends AbstractController
 {
     #[Route('/profil/{id?}', name: 'app_profil', requirements: ['id' => '\d+'])]
-    public function profile(UserInterface $user = null, int $id = null, UserRepository $userRepository): Response
+    public function profile(Request $request,
+                            SessionInterface $session,
+                            int $id = null,
+                            UserRepository $userRepository): Response
     {
 
         // Si un ID est fourni, on cherche l'utilisateur correspondant
         if ($id !== null) {
-            $user = $userRepository->find($id);
+            $user = $userRepository->findWithSiteById($id);
+        }else{
+            $user = $this->getUser();
         }
+
+
+        $referer = $request->headers->get('referer');
+
+        if($referer !== 'http://localhost:8000/profil/modifier'){
+            $session->set('previous_back_url', $referer);
+        }
+
+        $previousUrl = $session->get('previous_back_url');
+
 
         if (!$user){
             $this->addFlash('danger', 'Cet utilisateur n\'existe pas');
@@ -40,6 +56,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
+            'backLink' => $previousUrl,
         ]);
     }
 
