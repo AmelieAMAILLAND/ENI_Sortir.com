@@ -35,6 +35,12 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
     })
 
+    window.addEventListener("keydown", function (e){
+        if(e.key === "Escape" || e.key === "Esc"){
+            closeModal(e)
+        }
+    })
+
     // stockage et récupération des données du formulaire et de l'état de la modale lors de la création ou de la modification d'un lieu
     const destockDatas = () =>{
         if (sessionStorage.getItem('datas')){
@@ -103,7 +109,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
     places.forEach((place) => {
         lat = place.latitude;
         lon = place.longitude;
-        if (currentPlaceName.value===place.name){
+        if (currentPlaceName.textContent===place.name){
             map.setView([lat,lon]);
         }
         let marker = L.marker([lat,lon]);
@@ -120,7 +126,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
         marker.on('popupopen', function() {
             document.getElementById(`chose-place-${place.id}`).addEventListener('click', (e) => {
                 e.preventDefault();
-                currentPlaceName.value = place.name;
+                currentPlaceName.textContent = place.name;
                 // currentEvent.place=place;
                 currentPlace.value=place.id;
                 console.log(currentEvent);
