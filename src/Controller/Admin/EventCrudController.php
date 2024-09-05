@@ -68,7 +68,7 @@ class EventCrudController extends AbstractCrudController
                 ->setRequired(true)
                 ->setHelp('La date limite pour s\'inscrire à l\'événement'),
 
-            IntegerField::new('maxNbRegistration', 'Nombre max de participants')
+            IntegerField::new('maxNbRegistration', 'max participants')
                 ->setRequired(true)
                 ->setHelp('Le nombre maximum de participants autorisés'),
 

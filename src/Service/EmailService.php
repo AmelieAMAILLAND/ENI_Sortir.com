@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -30,4 +31,37 @@ class EmailService
         }
     }
 
+    public function sendFirstLoginEmail(string $recipientEmail, string $pseudo, string $firstLoginUrl): void
+    {
+        $email = (new TemplatedEmail())
+            ->from('no-reply@example.com')
+            ->to($recipientEmail)
+            ->subject('Finalisez votre inscription : Sortir.com')
+            ->htmlTemplate('reset_password/first_connexion.html.twig')
+            ->context([
+                'pseudo' => $pseudo,
+                'firstLoginUrl' => $firstLoginUrl,
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    // Envoi d'un email pour la réinitialisation de mot de passe
+    public function sendPasswordResetEmail(string $recipientEmail, string $resetToken): void
+    {
+        $email = (new TemplatedEmail())
+            ->from('no-reply@sortir.com')
+            ->to($recipientEmail)
+            ->subject('Réinitialisation de votre mot de passe')
+            ->htmlTemplate('reset_password/email.html.twig')
+            ->context([
+                'resetToken' => $resetToken,
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+
+
 }
+

@@ -2,19 +2,20 @@
 
 namespace App\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Service\EmailService;
 use App\Repository\UserRepository;
-use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use App\Entity\User;
 use App\Entity\Site;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -24,78 +25,56 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserCrudController extends AbstractCrudController
 {
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
-
-    /**
-     * @var AdminUrlGenerator
-     */
     private $adminUrlGenerator;
+    private $emailService;
+    private $passwordHasher;
+    private $validator;
+    private $resetPasswordHelper;
 
-
-    /**
+     /**
      * @param EntityManagerInterface $entityManager
      * @param AdminUrlGenerator $adminUrlGenerator
      */
     public function __construct(EntityManagerInterface $entityManager,
                                 AdminUrlGenerator $adminUrlGenerator,
-                                UserRepository $userRepository)
+                                UserRepository $userRepository,
+                                EmailService $emailService,
+                                UserPasswordHasherInterface $passwordHasher,
+                                ValidatorInterface $validator,
+                                ResetPasswordHelperInterface $resetPasswordHelper)
     {
         $this->entityManager = $entityManager;
         $this->adminUrlGenerator = $adminUrlGenerator;
+        $this->emailService = $emailService;
+        $this->passwordHasher = $passwordHasher;
+        $this->validator = $validator;
+        $this->resetPasswordHelper = $resetPasswordHelper;
         $this->userRepository = $userRepository;
-
     }
 
-    /**
-     * @return string
-     */
     public static function getEntityFqcn(): string
     {
         return User::class;
     }
 
-    /**
-     * @param string $pageName
-     * @return iterable
-     * Configure les champs qui apparaîtront dans l'interface d'administration
-     */
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-
             AssociationField::new('site')->setRequired(true),
-
             EmailField::new('email'),
-
             TextField::new('pseudo'),
-
             TextField::new('firstName', 'First Name'),
-
             TextField::new('lastName', 'Last Name'),
-
             TelephoneField::new('phone', 'Phone'),
-
-            TextField::new('password', 'Password')
-                ->setFormTypeOption('attr.type', 'password')
-                ->onlyOnForms()
-                ->hideWhenUpdating()
-                ->setHelp('Définir un mot de passe temporaire.'),
-
             ChoiceField::new('roles')
                 ->setChoices([
                     'Admin' => 'ROLE_ADMIN',
@@ -103,19 +82,15 @@ class UserCrudController extends AbstractCrudController
                 ])
                 ->allowMultipleChoices()
                 ->renderExpanded(),
-
             BooleanField::new('isActive', 'Active'),
-
-            IntegerField::new('eventCount', 'Inscriptions')
-                ->onlyOnIndex(),
+            IntegerField::new('eventCount', 'Inscriptions')->onlyOnIndex(),
         ];
-
     }
 
     /**
      * @param Actions $actions
      * @return Actions
-     * Configurer les actions disponibles dans l'interface d'administration
+     * Configurer les actions disponibles dans l'interface d'administration&
      */
     public function configureActions(Actions $actions): Actions
     {
@@ -129,13 +104,7 @@ class UserCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $importCsv)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action->setLabel('+ utilisateur');
-            })
-            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
-                return $action->setCssClass('btn')->displayIf(function ($entity) {
-                    return $entity->getEventCount() === 0;
-                });
             });
-
     }
 
     /**
@@ -169,12 +138,12 @@ class UserCrudController extends AbstractCrudController
                 // Validation et traitement des données.
                 if ($csvData) {
                     foreach ($csvData as $row) {
-                        if (count($row) != 8) {
+                        if (count($row) != 7) {
                             $this->addFlash('error', 'Le fichier CSV ne contient pas le bon nombre de colonnes.');
                             continue;
                         }
 
-                        list($email, $pseudo, $firstName, $lastName, $phone, $password, $roles, $siteName) = $row;
+                        list($email, $pseudo, $firstName, $lastName, $phone, $roles, $siteName) = $row;
 
                         $site = $this->entityManager->getRepository(Site::class)->findOneBy(['name' => $siteName]);
 
@@ -189,12 +158,33 @@ class UserCrudController extends AbstractCrudController
                         $user->setFirstName($firstName);
                         $user->setLastName($lastName);
                         $user->setPhone($phone);
-                        $user->setPassword(password_hash($password, PASSWORD_BCRYPT)); // Hachage du mot de passe
+
+                        $temporaryPassword = $this->generateTemporaryPassword();
+                        $hashedPassword = $this->passwordHasher->hashPassword($user, $temporaryPassword);
+                        $user->setPassword($hashedPassword);
+
                         $user->setRoles([$roles]);
-                        $user->setSite($site); // Associe l'utilisateur au site trouvé
+                        $user->setSite($site);
                         $user->setIsActive(true);
 
+                        // Validation de l'utilisateur
+                        $errors = $this->validator->validate($user, null, ['AdminCreation']);
+                        if (count($errors) > 0) {
+                            foreach ($errors as $error) {
+                                $this->addFlash('error', $error->getMessage());
+                            }
+                            continue;
+                        }
+
+                        // Persistance de l'utilisateur
                         $this->entityManager->persist($user);
+
+                        // Génération du token pour la première connexion
+                        $resetToken = $this->resetPasswordHelper->generateResetToken($user);
+                        $firstLoginUrl = $this->generateUrl('app_reset_password', ['token' => $resetToken->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+                        // Envoi de l'e-mail de confirmation
+                        $this->emailService->sendFirstLoginEmail($user->getEmail(), $user->getPseudo(), $firstLoginUrl);
                     }
 
                     try {
@@ -217,10 +207,57 @@ class UserCrudController extends AbstractCrudController
             }
 
         }
-        //Rendu du formulaire
+        // Rendu du formulaire
         return $this->render('bundles/EasyAdminBundle/crud/import.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+
+    private function generateTemporaryPassword(): string
+    {
+        return bin2hex(random_bytes(10)); // Génère un mot de passe de 20 caractères aléatoires
+    }
+
+    private function generateFirstLoginToken(User $user): string
+    {
+        $firstLoginToken = Uuid::v4()->toRfc4122(); // Génération d'un UUID unique
+        $user->setPassword($firstLoginToken); // Correctement utiliser setFirstLoginToken
+        return $firstLoginToken;
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof User) {
+            // Générer un mot de passe temporaire aléatoire
+            $temporaryPassword = $this->generateTemporaryPassword();
+
+            // Hacher le mot de passe temporaire avec bcrypt
+            $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $temporaryPassword);
+            $entityInstance->setPassword($hashedPassword);
+
+            // Valider l'utilisateur avec le groupe de validation "AdminCreation"
+            $errors = $this->validator->validate($entityInstance, null, ['AdminCreation']);
+
+            if (count($errors) > 0) {
+                foreach ($errors as $error) {
+                    $this->addFlash('error', $error->getMessage());
+                }
+                return;
+            }
+
+            // Persister l'utilisateur dans la base de données
+            parent::persistEntity($entityManager, $entityInstance);
+
+            // Générer un token pour la première connexion
+            $resetToken = $this->resetPasswordHelper->generateResetToken($entityInstance);
+
+            // Générer l'URL pour la première connexion avec le token
+            $firstLoginUrl = $this->generateUrl('app_reset_password', ['token' => $resetToken->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            // Envoyer l'e-mail de confirmation avec le lien de première connexion
+            $this->emailService->sendFirstLoginEmail($entityInstance->getEmail(), $entityInstance->getPseudo(), $firstLoginUrl);
+        }
     }
 
     /**
@@ -238,16 +275,9 @@ class UserCrudController extends AbstractCrudController
         if (!$entityInstance->getIsActive()) {
             $entityInstance->deactivate();
         }
-        
+
         $entityManager->persist($entityInstance);
         $entityManager->flush();
-    }
-
-
-    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
-    {
-        $response = $this->userRepository->easyAdminFindAllUsers();
-        return $response; // TODO: Change the autogenerated stub
     }
 
 }
