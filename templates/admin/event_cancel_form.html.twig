@@ -1,0 +1,33 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Annuler l'événement</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <p>Êtes-vous sûr de vouloir annuler l'événement "{{ event.name }}" ? Veuillez fournir un motif d'annulation.</p>
+            </div>
+        </div>
+
+        <form method="post" action="">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="motif_annulation">Motif d'annulation</label>
+                        <textarea name="motif_annulation" id="motif_annulation" class="form-control" rows="4" required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <button type="submit" formaction="{{ path('admin', {crudAction: 'confirmCancel', entityId: event.id}) }}" class="btn btn-danger">
+                        Confirmer l'annulation
+                    </button>
+                    <a href="{{ path('admin', {crudAction: 'index', crudControllerFqcn: 'App\\Controller\\Admin\\EventCrudController'}) }}" class="btn btn-secondary">Retour</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

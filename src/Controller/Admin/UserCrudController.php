@@ -169,12 +169,12 @@ class UserCrudController extends AbstractCrudController
                 // Validation et traitement des données.
                 if ($csvData) {
                     foreach ($csvData as $row) {
-                        if (count($row) < 9) {
+                        if (count($row) != 8) {
                             $this->addFlash('error', 'Le fichier CSV ne contient pas le bon nombre de colonnes.');
                             continue;
                         }
 
-                        list($email, $pseudo, $firstName, $lastName, $phone, $password, $roles, $isActive, $siteName) = $row;
+                        list($email, $pseudo, $firstName, $lastName, $phone, $password, $roles, $siteName) = $row;
 
                         $site = $this->entityManager->getRepository(Site::class)->findOneBy(['name' => $siteName]);
 
@@ -191,8 +191,8 @@ class UserCrudController extends AbstractCrudController
                         $user->setPhone($phone);
                         $user->setPassword(password_hash($password, PASSWORD_BCRYPT)); // Hachage du mot de passe
                         $user->setRoles([$roles]);
-                        $user->setIsActive((bool)$isActive);
                         $user->setSite($site); // Associe l'utilisateur au site trouvé
+                        $user->setIsActive(true);
 
                         $this->entityManager->persist($user);
                     }

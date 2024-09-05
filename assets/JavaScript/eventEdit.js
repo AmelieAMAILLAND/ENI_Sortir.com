@@ -112,8 +112,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
                                     <h2 class="text-lg text-center">${place.name}</h2>
                                     <p>${place.street}</p>
                                     <p>${place.zipCode} ${place.city}</p>
-                                    <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80 js-place-btn">Modifier</a> 
-                                    <button id="chose-place-${place.id}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto hover:opacity-80">Sélectionner</button></p>
+                                    <p><a href="/place/${place.id}/edit" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto text-black hover:opacity-80 js-place-btn" title="Modifier les informations de ce lieu">Modifier</a> 
+                                    <button id="chose-place-${place.id}" class="bg-amber-400 rounded-md py-1 px-2 max-w-fit mx-auto text-black hover:opacity-80" title="Choisir ce lieu pour votre sortie">Sélectionner</button></p>
                                 </div>
                             </div>`;
         marker.bindPopup(popup).addTo(map);
