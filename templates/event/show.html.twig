@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Event{% endblock %}
+{% block title %}Détails sortie{% endblock %}
 
 {% block stylesheets%}
     {{ parent() }}
@@ -33,12 +33,18 @@
                     <div class="mb-2">
                         <p>{{ event.infoEvent }}</p>
                     </div>
+                    {% if event.annulation is not null %}
+                        <div class="mb-2 ">
+                            <p class="font-semibold">Motif d'annulation : </p>
+                            <p class="text-red-500">{{ event.annulation }}</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="pt-4 pb-2 text-sm">
                     <p>Organisé par <a href="{{ path('app_profil',{'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>
                 </div>
             </div>
-            <div id="map" class="h-96 mb-2 md:w-3/5"></div>
+            <div id="map" class="h-96 mb-2 md:w-3/5 "></div>
         </div>
         <div class="w-full mb-2">
             <table class="w-full table-auto">
@@ -72,9 +78,21 @@
             {% endif %}
         {% endif %}
     </div>
+    
+    <div class="btn-container flex w-[400px] justify-center gap-3 mx-auto mt-5">
+        
+        {% if app.user.pseudo == event.planner.pseudo %}
+            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class=" py-2 px-4  bg-amber-500 rounded-md text-white hover:opacity-80">Modifier</a>
+        {% endif %}
+        
+        <a href="{{ path('app_event_index') }}" class="py-2 px-4 bg-blue-800 rounded-md text-white hover:opacity-80">Retour aux sorties</a>
+    </div>
+
+
 
 {% endblock %}
 {% block javascripts %}
+    {{ parent() }}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="{{ asset('JavaScript/eventShow.js') }}"></script>
 {% endblock %}

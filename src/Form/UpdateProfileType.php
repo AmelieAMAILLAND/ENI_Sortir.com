@@ -31,7 +31,7 @@ class UpdateProfileType extends AbstractType
                 'label' => 'Téléphone ',
             ])
             ->add('email', EmailType::class, [
-                'label' => 'email ',
+                'label' => 'Email ',
             ])
             ->add('password', PasswordType::class, [
                 'mapped' => false,
