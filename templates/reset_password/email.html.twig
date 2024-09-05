@@ -1,3 +1,4 @@
+
 <div style="width: 100%; display: flex; justify-content: center; align-items: center;">
     <div style="max-width: 500px; width: 90%; background-color: white; border: 4px solid #8800ff; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 30px; display: flex; flex-direction: column; align-items: center;">
         <h1 style="font-size: 24px; margin-bottom: 20px;">Réinitialisation du mot de passe</h1>
@@ -9,6 +10,9 @@
                 <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" style="color: black; text-decoration: none;">Réinitialiser mon mot de passe</a>
             </button>
         </div>
+
+
+<p>Ce lien expire dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
 
         <p style="margin-bottom: 15px;">Ce lien est valable jusqu'au {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
 

@@ -268,7 +268,6 @@ function mapStatusToFrench(status){
 }
 
 
-document.getElementById('submitBtn').addEventListener('click', e=>fetchAndDisplay())
 
 async function fetchAndDisplay(){
 
