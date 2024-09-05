@@ -109,8 +109,7 @@ class EventController extends AbstractController
         return $this->render('event/edit.html.twig', [
             'event' => $event,
             'places' => $places,
-            'form' => $form,
-            'backLink'=>$request->headers->get('referer')
+            'form' => $form
         ]);
     }
 
