@@ -54,7 +54,7 @@
                 {% endif %}
 
                 {% if event.state=='published' or event.state=='in_progress' or event.state=='closed' or event.state=='full' %}
-                    <span class="bg-amber-400 rounded-md py-1 px-2 mr-2 max-w-fit hover:opacity-80">{{ form_widget(form.submit) }}</span>
+                    <span class="bg-amber-400 rounded-md py-1 px-2 mr-2 max-w-fit hover:opacity-80">{{ form_widget(form.publish) }}</span>
                 {% endif %}
 
                 {% do form.submit.setRendered %} {# pour les exclures du form_rest #}

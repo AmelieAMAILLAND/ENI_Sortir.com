@@ -52,7 +52,7 @@ class UpdateProfileType extends AbstractType
             ])
 
             ->add('profilePicture', FileType::class, [
-                'label' => 'photo de profil ',
+                'label' => 'Photo de profil ',
                 'required' => false,
                 'mapped' => false,
             ])

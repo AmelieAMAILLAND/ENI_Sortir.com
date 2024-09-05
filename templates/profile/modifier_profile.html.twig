@@ -9,7 +9,7 @@
 
             {{ form_start(form, { 'attr': {'enctype': 'multipart/form-data'} }) }}
 
-            <div class="profile-container grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div class="profile-container grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-10">
                 <div class="profile-image flex flex-col items-center">
 
                     <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}"
@@ -110,7 +110,7 @@
             </div>
 
             <!-- Positionnement des boutons sous le formulaire -->
-            <div class="form-buttons mt-6 flex justify-center space-x-4">
+            <div class="form-buttons mt-6 flex justify-center space-x-4 mb-5">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
                 <a href="{{ path('app_profil') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annuler</a>
             </div>
