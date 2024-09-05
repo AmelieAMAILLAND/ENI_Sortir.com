@@ -38,6 +38,23 @@ class EventRepository extends ServiceEntityRepository
     }
 
 
+    public function findByIdWithEveryField(int $id): ?Event{
+
+        return $this->createQueryBuilder('e')
+            ->addSelect('user')
+            ->addSelect('planner')
+            ->addSelect('place')
+            ->leftJoin('e.registered', 'user')
+            ->innerJoin('e.planner','planner')
+            ->innerJoin('e.place','place')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
+
     public function easyAdminFindAllEvents(){
         return $this->createQueryBuilder('e')
             ->select('e')
