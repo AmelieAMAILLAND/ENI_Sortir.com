@@ -35,6 +35,12 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
     })
 
+    window.addEventListener("keydown", function (e){
+        if(e.key === "Escape" || e.key === "Esc"){
+            closeModal(e)
+        }
+    })
+
     // stockage et récupération des données du formulaire et de l'état de la modale lors de la création ou de la modification d'un lieu
     const destockDatas = () =>{
         if (sessionStorage.getItem('datas')){
