@@ -14,6 +14,12 @@ class EventListener
 
     public function postLoad(Event $event): void{
 
+        //Si created, le statut ne dépend change pas
+        if($event->getState()==='created'){
+            $event->setState('created');
+            return;
+        }
+
         //Si annulée, le statut ne dépend plus de la date actuelle.
         if($event->getState()==='canceled'){
             $event->setState('canceled');
