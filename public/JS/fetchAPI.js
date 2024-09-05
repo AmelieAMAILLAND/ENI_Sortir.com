@@ -50,16 +50,6 @@ async function fetchEventAPI(url){
         });
         let data = await response.json()
 
-        //console.log("Avant filtre: ", data);
-
-        //On remet le dernier filtre sur l'affichage des éléments 'archived' si on n'est pas admin OU pas l'organisateur.
-
-        if(!isUserAnAdmin){
-            data = data.filter(event => (event.state !== 'archived') || (event.state==='archived' && event.planner.pseudo === userPseudo))
-        }
-
-       // console.log("Après filtre: ", data);
-
         return data;
 
     }catch(err){
