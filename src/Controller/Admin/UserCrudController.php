@@ -9,6 +9,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Service\EmailService;
+use App\Repository\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -36,23 +37,27 @@ class UserCrudController extends AbstractCrudController
     private $emailService;
     private $passwordHasher;
     private $validator;
-
     private $resetPasswordHelper;
 
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        AdminUrlGenerator $adminUrlGenerator,
-        EmailService $emailService,
-        UserPasswordHasherInterface $passwordHasher,
-        ValidatorInterface $validator,
-        ResetPasswordHelperInterface $resetPasswordHelper
-    ) {
+     /**
+     * @param EntityManagerInterface $entityManager
+     * @param AdminUrlGenerator $adminUrlGenerator
+     */
+    public function __construct(EntityManagerInterface $entityManager,
+                                AdminUrlGenerator $adminUrlGenerator,
+                                UserRepository $userRepository,
+                                EmailService $emailService,
+                                UserPasswordHasherInterface $passwordHasher,
+                                ValidatorInterface $validator,
+                                ResetPasswordHelperInterface $resetPasswordHelper)
+    {
         $this->entityManager = $entityManager;
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->emailService = $emailService;
         $this->passwordHasher = $passwordHasher;
         $this->validator = $validator;
-        $this->resetPasswordHelper = $resetPasswordHelper; // Assignation du service
+        $this->resetPasswordHelper = $resetPasswordHelper;
+        $this->userRepository = $userRepository;
     }
 
     public static function getEntityFqcn(): string
@@ -100,9 +105,7 @@ class UserCrudController extends AbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action->setLabel('+ utilisateur');
             });
-
     }
-
 
     /**
      * @param Request $request
@@ -156,13 +159,12 @@ class UserCrudController extends AbstractCrudController
                         $user->setLastName($lastName);
                         $user->setPhone($phone);
 
-                        // Génération et hachage du mot de passe temporaire
                         $temporaryPassword = $this->generateTemporaryPassword();
                         $hashedPassword = $this->passwordHasher->hashPassword($user, $temporaryPassword);
                         $user->setPassword($hashedPassword);
 
                         $user->setRoles([$roles]);
-                        $user->setSite($site); // Associe l'utilisateur au site trouvé
+                        $user->setSite($site);
                         $user->setIsActive(true);
 
                         // Validation de l'utilisateur
@@ -193,11 +195,14 @@ class UserCrudController extends AbstractCrudController
                         $this->addFlash('error', 'Une erreur est survenue lors de l\'enregistrement des données : ' . $e->getMessage());
                     }
 
-                } else {
+                    // Gestion des erreurs
+                }
+                else {
                     $this->addFlash('error', 'Le fichier CSV est vide ou mal formaté.');
                 }
 
-            } else {
+            }
+            else {
                 $this->addFlash('error', 'Aucun fichier valide n\'a été uploadé.');
             }
 
@@ -207,8 +212,6 @@ class UserCrudController extends AbstractCrudController
             'form' => $form->createView(),
         ]);
     }
-
-
 
 
     private function generateTemporaryPassword(): string
@@ -278,8 +281,4 @@ class UserCrudController extends AbstractCrudController
     }
 
 }
-
-
-
-
 
