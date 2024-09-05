@@ -152,6 +152,14 @@ class EventController extends AbstractController
         $event = $eventRepository->findByIdWithEveryField($id);
 
 
+        $referer = $request->headers->get('referer');
+
+        if($referer !== 'http://localhost:8000/place/new'){
+            $session->set('previous_back_url', $referer);
+        }
+
+        $previousUrl = $session->get('previous_back_url');
+
 
         if (!$event){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car il n\'existe pas');
@@ -188,6 +196,7 @@ class EventController extends AbstractController
                 'event' => $event,
                 'places' => $places,
                 'form' => $form,
+                'backLink'=>$previousUrl
             ]);
         } elseif ($owner !== $this->getUser()) {
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur');
@@ -197,6 +206,8 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_event_index');
         }
     }
+
+
 
     #[Route('/{id}', name: '_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, ?Event $event, EntityManagerInterface $entityManager): Response
