@@ -137,7 +137,7 @@ function buildEventTableHtml(event){
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
-            ${(userPseudo === event.planner.pseudo && event.state !== 'archived') ? 
+            ${(userPseudo === event.planner.pseudo && ['created', 'published', 'closed', 'full'].includes(event.state)) ? 
             `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
                 
             </td>
@@ -216,7 +216,7 @@ function buildEventCardHtml(event){
                    class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR
                 </a>
               
-            ${(userPseudo === event.planner.pseudo && event.state !== 'archived') ?
+            ${(userPseudo === event.planner.pseudo && ['created', 'published', 'closed', 'full'].includes(event.state)) ?
         `<a href='/event/${event.id}/edit' class='py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80'>MODIFIER</a>` : ''}
            
         </div>
