@@ -31,9 +31,6 @@ class EventCrudController extends AbstractCrudController
 {
 
     private EmailService $emailService;
-
-    public function __construct()
-    {
        
     public function __construct(EventRepository $eventRepository, EmailService $emailService){
         $this->eventRepository = $eventRepository;
