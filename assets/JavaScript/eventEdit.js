@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
     places.forEach((place) => {
         lat = place.latitude;
         lon = place.longitude;
-        if (currentPlaceName.value===place.name){
+        if (currentPlaceName.textContent===place.name){
             map.setView([lat,lon]);
         }
         let marker = L.marker([lat,lon]);
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
         marker.on('popupopen', function() {
             document.getElementById(`chose-place-${place.id}`).addEventListener('click', (e) => {
                 e.preventDefault();
-                currentPlaceName.value = place.name;
+                currentPlaceName.textContent = place.name;
                 // currentEvent.place=place;
                 currentPlace.value=place.id;
                 console.log(currentEvent);

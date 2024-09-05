@@ -39,22 +39,15 @@
                 {{ form_row(form.maxNbRegistration) }}
                 {{ form_row(form.infoEvent) }}
             </div>
-            <div class="mb-6">
+            <div class="pb-2 mb-6 w-full">
                 <div class="hidden">
                     {{ form_row(form.place) }}
                 </div>
-                <p>Lieu</p>
-                {% if event.id!=null %}
-                    <input id="place-name" class="mt-1 mb-2 w-full" disabled value="{{ event.place.name }}">
-                {% else %}
-                    <input id="place-name" class="mt-1 mb-2 w-full" disabled value="">
-                {% endif %}
-                <div class="flex justify-start">
-                    <a href="{{ path('app_place_new') }}" class="bg-amber-400 rounded-md mb-2 py-1 px-2 max-w-fit mr-2 hover:opacity-80 js-place-btn" title="Créer un nouveau lieu d'activité">Nouveau lieu</a>
-                    <a href="#modal" class="bg-amber-400 rounded-md mb-2 py-1 px-2 max-w-fit mr-2 modal-btn js-modal hover:opacity-80" title="Choisir un lieu parmi les lieux existants">Choisir</a>
-                </div>
+                <p class="mb-2">Lieu</p>
+                <a href="#modal" id="place-name" class="block w-full h-11 bg-white mt-1 border border-gray-500 mb-2 px-3 py-2 mr-2 modal-btn js-modal hover:opacity-80 hover:bg-amber-400 hover:rounded-md hover:border-0"
+                   title="Choisir un lieu parmi les lieux existants">{% if event.place!=null %}{{ event.place.name }}{% endif %}</a>
             </div>
-            <div class="flex justify-start mb-2">
+            <div class="flex justify-center mb-2">
                 {% if event.state=='created' %}
                     <span class="bg-amber-400 rounded-md py-1 px-2 mr-2 max-w-fit hover:opacity-80">{{ form_widget(form.submit) }}</span>
                     <span class="bg-amber-400 rounded-md py-1 px-2 mr-2 max-w-fit hover:opacity-80">{{ form_row(form.publish) }}</span>
@@ -72,10 +65,11 @@
 
             </div>
         {{ form_end(form) }}
-
-        {% if app.current_route=='app_event_edit' and event.state=='created'%} {{ include('event/_delete_form.html.twig') }} {% endif %}
-        {% if app.current_route=='app_event_edit' and event.state=='published'%} {{ include('event/_cancel_form.html.twig') }} {% endif %}
-        <a href="{{ path('app_event_index') }}" class="bg-amber-200 rounded-md py-1 px-2 max-w-fit hover:opacity-80" title="Retour à la liste des sorties">Annuler les modifications</a>
+        <div class="flex flex-col items-center">
+            {% if app.current_route=='app_event_edit' and event.state=='created'%} {{ include('event/_delete_form.html.twig') }} {% endif %}
+            {% if app.current_route=='app_event_edit' and event.state=='published'%} {{ include('event/_cancel_form.html.twig') }} {% endif %}
+            <a href="{{ path('app_event_index') }}" class="bg-amber-200 rounded-md py-1 px-2 max-w-fit hover:opacity-80" title="Retour à la liste des sorties">Annuler {% if app.current_route=='app_event_new' %}la création{% else %}les modifications{% endif %}</a>
+        </div>
     </div>
 {% endblock %}
 {% block javascripts %}
