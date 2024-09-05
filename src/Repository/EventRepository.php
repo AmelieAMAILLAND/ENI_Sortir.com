@@ -92,7 +92,9 @@ class EventRepository extends ServiceEntityRepository
                         $now = (new \DateTime())->modify('+2 hours');
                         $nowMinusOneMonth = (clone $now)->modify('-1 month');
 
-                        $query->andWhere('(e.state = (:published)) OR (e.state IN (:otherState) AND user.pseudo = :requesterPseudo) OR ( user.pseudo = :requesterPseudo AND (e.dateTimeStart < :oneMonthAgo AND e.state = :published))')
+                        $query->andWhere('(e.state = :published AND (e.dateTimeStart > :oneMonthAgo)) OR 
+                        (e.state IN (:otherState) AND user.pseudo = :requesterPseudo) OR
+                        (user.pseudo = :requesterPseudo AND (e.dateTimeStart < :oneMonthAgo AND e.state = :published))')
                         ->setParameter('published', 'published')
                             ->setParameter('oneMonthAgo', $nowMinusOneMonth)
                         ->setParameter('otherState', ['canceled','created'])

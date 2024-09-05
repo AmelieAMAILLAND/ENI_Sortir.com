@@ -71,8 +71,13 @@ class EventController extends AbstractController
 
 
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, PlaceRepository $placeRepository, SessionInterface $session, SerializerInterface $serializer): Response
+    public function new(Request $request,
+                        EntityManagerInterface $entityManager,
+                        PlaceRepository $placeRepository,
+                        SessionInterface $session,
+                        SerializerInterface $serializer): Response
     {
+
         $event = new Event();
         $event->setPlanner($this->getUser());
         $event->setState('created');
@@ -105,6 +110,7 @@ class EventController extends AbstractController
             'event' => $event,
             'places' => $places,
             'form' => $form,
+            'backLink'=>$request->headers->get('referer')
         ]);
     }
 
