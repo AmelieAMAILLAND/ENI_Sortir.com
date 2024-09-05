@@ -36,7 +36,8 @@ class ProfileController extends AbstractController
 
         $referer = $request->headers->get('referer');
 
-        if($referer !== 'http://localhost:8000/profil/modifier'){
+        $conditionSaveUrl = str_ends_with($referer, '/modifier') ? false : true;
+        if($conditionSaveUrl){
             $session->set('previous_back_url', $referer);
         }
 
