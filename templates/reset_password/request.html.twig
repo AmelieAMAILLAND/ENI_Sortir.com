@@ -4,7 +4,7 @@
 {% block title %}Réinitialisez votre mot de passe{% endblock %}
 
 {% block body %}
-    <div class="relative w-full flex items-center justify-center">
+    <div class="relative h-full flex items-center justify-center bg-auto" style="background-image: url('{{ asset('images/bg-accueil-dark.jpg') }}');">
         <div class="container mx-auto px-4 py-16 z-10">
             <form method="post" class="bg-white rounded-lg shadow-md p-8 max-w-xl mx-auto border-4 border-[#8800ff]">
                 {% for flash_error in app.flashes('reset_password_error') %}
