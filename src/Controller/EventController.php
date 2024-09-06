@@ -109,8 +109,7 @@ class EventController extends AbstractController
         return $this->render('event/edit.html.twig', [
             'event' => $event,
             'places' => $places,
-            'form' => $form,
-            'backLink'=>$request->headers->get('referer')
+            'form' => $form
         ]);
     }
 
@@ -175,7 +174,7 @@ class EventController extends AbstractController
 
         $places = $serializer->serialize($placeRepository->findAll(), 'json');
 
-        if ($owner === $this->getUser() && ($event->getState() === 'created' || $event->getState() === 'published')) {
+        if ($owner === $this->getUser() && (in_array($event->getState(), ['created', 'published', 'full', 'closed']))) {
             $newPlaceId = $request->query->get('newPlaceId');
             if ($newPlaceId) {
                 $newPlace = $placeRepository->find($newPlaceId);
