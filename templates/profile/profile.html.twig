@@ -3,7 +3,7 @@
 {% block title %}Mon Profil{% endblock %}
 
 {% block body %}
-    <div class="relative bg-center bg-cover h-full flex items-center justify-center" style="background-image: url('{{ asset('images/fun-image2.jpg') }}');">
+    <div class="relative h-full flex items-center justify-center" style="background-image: url('{{ asset('images/bg-accueil-dark.jpg') }}');">
         <div class="container mx-auto flex flex-col items-center justify-center">
             <div class="flex items-center justify-center mb-4">
                 <img id="profile-picture-preview" src="{{ asset(user.getProfilePictureOrDefault()) }}"
