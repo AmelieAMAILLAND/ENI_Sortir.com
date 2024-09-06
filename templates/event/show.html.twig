@@ -12,7 +12,6 @@
     <div class="js-datas" data-place="{{ event.place|serialize(format='json') }}"></div>
     <div class="mt-5 p-4 max-w-screen-md mx-auto border border-slate-100 bg-amber-50 shadow-md rounded-md flex-col">
         <div>
-            <time class="text-xs">{{ event.dateTimeStart |date('d/m/Y')}}</time>
             <h1 class="mb-3 font-semibold text-center text-3xl">{{ event.name }}</h1>
         </div>
 
@@ -81,7 +80,7 @@
     
     <div class="btn-container flex w-full justify-center gap-3 mx-auto mt-5">
         
-        {% if app.user.pseudo == event.planner.pseudo %}
+        {% if app.user.pseudo == event.planner.pseudo and event.state in modifyStates %}
             <a href="{{ path('app_event_edit', {'id': event.id}) }}" class=" py-2 px-4  bg-amber-500 rounded-md text-white hover:opacity-80">Modifier</a>
         {% endif %}
         

@@ -140,6 +140,7 @@ class EventController extends AbstractController
 
         return $this->render('event/show.html.twig', [
             'event' => $event,
+            'modifyStates'=>['published','full','closed', 'created']
         ]);
     }
 
@@ -201,7 +202,8 @@ class EventController extends AbstractController
                 'event' => $event,
                 'places' => $places,
                 'form' => $form,
-                'backLink'=>$previousUrl
+                'backLink'=>$previousUrl,
+                'cancelStates'=>['published','full','closed']
             ]);
         } elseif ($owner !== $this->getUser()) {
             $this->addFlash('danger', 'Vous ne pouvez pas modifier cet évènement car vous n\'en êtes pas l\'organisateur');

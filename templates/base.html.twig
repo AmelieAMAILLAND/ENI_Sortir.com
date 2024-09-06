@@ -39,7 +39,7 @@
             </li>
 
             {% if is_granted('ROLE_USER') %}
-                <li class="{{ app.current_route == 'app_profil' ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
+                <li class="{{ app.current_route == 'app_profil' and app.user and app.user.id == user.id ? 'text-amber-300' : 'text-white' }} hover:opacity-80 max-sm:text-2xl max-sm:uppercase max-sm:w-full max-sm:text-center">
                     <a href="{{ path('app_profil') }}" class="lg:text-xl lg:font-bold">Mon profil</a>
                 </li>
             {% endif %}
