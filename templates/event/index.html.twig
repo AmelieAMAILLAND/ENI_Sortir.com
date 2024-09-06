@@ -16,13 +16,13 @@
             <img src="{{ asset('images/chevron-down.svg') }}" alt="toggle filters" class="h-10 w-10 ">
         </div>
 
-        <div class="form-container mb-6 max-w-[1200px] mx-auto rounded-md border border-slate-100 bg-amber-50">
+        <div class="form-container mb-6 max-w-[1200px] mx-auto rounded-md border border-[#8800ff] bg-white shadow-lg">
             <form method="GET" class="filters-form p-4 flex justify-between max-sm:flex-col max-sm:gap-3">
                 <div class="filters-container flex flex-col gap-2 min-w-[50%]">
                     <div class="status-site-container flex gap-3 justify-between max-sm:flex-col">
                         <div class="status-container flex items-center gap-2 max-sm:w-full max-sm:flex max-sm:justify-between max-sm:items-center">
                             <label for="status">Statut</label>
-                            <select name="status" id="status" class="js-select-input rounded-md max-sm:max-w-[50%]">
+                            <select name="status" id="status" class="js-select-input rounded-md border-[#8800ff] max-sm:max-w-[50%]">
                                 <option value="all">Tous les statuts</option>
                                 {% for status in statusArray %}
                                     <option value="{{ status }}" {{ filters.status == status ? 'selected' : ''}}>{{ status }}</option>
@@ -31,7 +31,7 @@
                         </div>
                         <div class="site-container max-sm:w-full max-sm:flex max-sm:justify-between max-sm:items-center">
                             <label for="siteName">Site</label>
-                            <select name="siteName" id="siteName" class="js-select-input rounded-md max-sm:max-w-[50%]">
+                            <select name="siteName" id="siteName" class="js-select-input rounded-md border-[#8800ff] max-sm:max-w-[50%]">
                                 <option value="all">Tous les sites</option>
                                 {% for site in sites %}
                                     <option value="{{ site.name }}" {{ filters.siteName == site.name ? 'selected' : ''}}>{{ site }}</option>
@@ -41,25 +41,21 @@
                     </div>
                     <div class="name-container flex gap-2 items-center justify-center w-full max-sm:flex max-sm:justify-between max-sm:items-center">
                         <label for="nameInput">Nom contenant </label>
-                        <input type="text" name="nameInput" id="nameInput" placeholder="..." value="{{ filters.nameInput }}" class="flex-grow rounded-md max-sm:max-w-[50%]">
+                        <input type="text" name="nameInput" id="nameInput" placeholder="..." value="{{ filters.nameInput }}" class="flex-grow rounded-md border-[#8800ff] max-sm:max-w-[50%]">
                     </div>
                     <div class="dates-container flex justify-between items-center max-sm:flex-col">
                         <label for="beginDate">Entre </label>
-                        <input type="datetime-local" name="beginDate" id="beginDate" value="{{ filters.beginDate }}" class="js-date-input rounded-md">
+                        <input type="datetime-local" name="beginDate" id="beginDate" value="{{ filters.beginDate }}" class="js-date-input rounded-md border-[#8800ff]">
                         <label for="endDate"> et </label>
-                        <input type="datetime-local" name="endDate" id="endDate" value="{{ filters.endDate }}" class="js-date-input rounded-md">
+                        <input type="datetime-local" name="endDate" id="endDate" value="{{ filters.endDate }}" class="js-date-input rounded-md border-[#8800ff]">
                     </div>
                     <div class="checkboxes-container">
                         <div class="places-planner-container flex justify-between items-center">
-    {#                        <div class="placesLeft">#}
-    {#                            <label for="placeLeft">Places restantes</label>#}
-    {#                            <input type="checkbox" id="placeLeft" name="placeLeft" class="js-checkboxes-input" {{ filters.placeLeft ? 'checked' : '' }}>#}
-    {#                        </div>#}
                             <div class="planner-container">
                                 <label class="flex justify-between items-center gap-2">
                                     Dont je suis organisateur
-                                <input type="checkbox" name="isPlanner" id="isPlanner"{{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input peer hidden bg-transparent">
-                                <span class="bg-gray-300 w-11 h-7 rounded-full flex flex-shrink-0 items-center after:bg-white after:w-5 after:h-5 after:rounded-full p-1 peer-checked:bg-green-500 peer-disabled:bg-red-500 peer-checked:after:translate-x-4 ease-in-out duration-400 after:duration-300"></span>
+                                    <input type="checkbox" name="isPlanner" id="isPlanner"{{ filters.isPlanner ? 'checked' : '' }} class="js-checkboxes-input peer hidden bg-transparent">
+                                    <span class="bg-gray-300 w-11 h-7 rounded-full flex flex-shrink-0 items-center after:bg-white after:w-5 after:h-5 after:rounded-full p-1 peer-checked:bg-green-500 peer-disabled:bg-red-500 peer-checked:after:translate-x-4 ease-in-out duration-400 after:duration-300"></span>
                                 </label>
                             </div>
                         </div>
@@ -89,9 +85,8 @@
                     {% endif %}
                 </div>
 
-
                 <div class="btns-container min-w-[30%] flex sm:flex-col items-center justify-center gap-4 mx-sm:flex-row">
-                    <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-md bg-slate-600 text-white hover:opacity-80 shadow-md">Réinitialiser</button>
+                    <button id="reset-filters-btn" class="max-w-[40%] min-w-fit py-2 px-4 rounded-full bg-[#ffe100] text-black text-lg font-bold hover:opacity-80 shadow-md">Réinitialiser</button>
                 </div>
 
             </form>
@@ -99,141 +94,139 @@
 
     </div>
 
-    
-{#    <div class="card-container {{ vue == "cards" ? 'grid' : 'hidden' }} grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">#}
-{#        {% for event in events %}#}
-{#            <div class="event-card#}
-{#            max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform#}
-{#            {{ event.state == 'published' ? 'bg-green-200' :#}
-{#            event.state == 'past' ? 'bg-gray-100' :#}
-{#            event.state == 'in_progress' ? 'bg-amber-50' :#}
-{#            event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
-{#            event.state == 'closed' ? 'bg-red-200' :#}
-{#            event.state == 'full' ? 'bg-stone-300' :#}
-{#            event.state == 'created' ? 'bg-blue-200' :#}
-{#            event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
-{#                <div class="name-and-date-container flex justify-between items-center">#}
-{#                    <p class="font-semibold text-xl hover:opacity-80">#}
-{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>#}
-{#                    </p>#}
-{#                    <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">#}
-{#                </div>#}
-{#                <div class="inscr-container flex justify-between items-center">#}
-{#                    <div class="limit-container ">#}
-{#                        <p class="font-semibold">Date limite : </p>#}
-{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date p-0 border-0 bg-inherit text-sm">#}
-{#                    </div>#}
-
-{#                    {% if (app.user.pseudo == event.planner.pseudo) %}#}
-{#                        <p class="text-blue-500 font-semibold">Organisateur</p>#}
-{#                    {% else %}#}
-{#                        {% if (app.user in event.registered) %}#}
-{#                            <p class="text-green-500 font-semibold">Inscrit</p>#}
-{#                        {% else %}#}
-{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
-{#                        {% endif %}#}
-{#                    {% endif %}#}
-
-{#                </div>#}
-{#                <div class="place-container">#}
-{#                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>#}
-{#                </div>#}
-{#                <div class="desc-container">#}
-{#                    <p>{{ event.infoEvent }}</p>#}
-{#                </div>#}
-{#                <div class="org-container flex justify-between">#}
-
-{#                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>#}
-{#                    <p class="">{{ event.state | mapStatusToFrench }}</p>#}
-
-{#                </div>#}
-{#                <div class="actions-container mx-auto max-w-fit mt-2">#}
-{#                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
-{#                    {% if event.planner.pseudo == app.user.pseudo %}#}
-{#                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
-{#                    {% endif %}#}
-{#                </div>#}
-
-
-{#            </div>#}
-
-{#        {% else %}#}
-{#            <div>#}
-{#                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>#}
-{#            </div>#}
-{#        {% endfor %}#}
-
-
-{#    </div>#}
-
-{#    <div class="table-container max-w-[1200px] mx-auto {{ vue == "cards" ? 'hidden' : 'block' }}">#}
-{#        <table class="table w-full">#}
-{#            <thead>#}
-{#            <tr class="border border-slate-900 bg-slate-900">#}
-{#                <th class="th-style">Nom</th>#}
-{#                <th class="th-style">Date de début</th>#}
-{#                <th class="th-style">Durée</th>#}
-{#                <th class="th-style">Clôture</th>#}
-{#                <th class="th-style">Inscrits/Places</th>#}
-{#                <th class="th-style">Inscrit</th>#}
-{#                <th class="th-style">État</th>#}
-{#                <th class="th-style">Actions</th>#}
-{#            </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#            {% for event in events %}#}
-
-{#                <tr class="hover:opacity-80#}
-{#                    {{ event.state == 'published' ? 'bg-green-200' :#}
-{#                event.state == 'past' ? 'bg-gray-100' :#}
-{#                event.state == 'in_progress' ? 'bg-amber-50' :#}
-{#                event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
-{#                event.state == 'closed' ? 'bg-red-200' :#}
-{#                event.state == 'full' ? 'bg-stone-300' :#}
-{#                event.state == 'created' ? 'bg-blue-200' :#}
-{#                event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
-
-{#                    <td class="td-style">{{ event.name }}</td>#}
-{#                    <td class="td-style">#}
-{#                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
-{#                    </td>#}
-{#                    <td class="td-style">{{ event.dateTimeStart ? event.dateTimeStart|date('d/m/Y H:i') : '' }}</td>#}
-{#                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
-{#                    <td class="td-style">#}
-{#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
-{#                    </td>#}
-{#                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>#}
-{#                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}#}
-{#                            <p class="text-blue-500 font-semibold">Organisateur</p>#}
-{#                        {% else %}#}
-{#                            {% if (app.user in event.registered) %}#}
-{#                                <p class="text-green-500 font-semibold">Inscrit</p>#}
-{#                            {% else %}#}
-{#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
-{#                            {% endif %}#}
-{#                        {% endif %}</td>#}
-{#                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>#}
-{#                    <td class="td-style flex justify-center items-center gap-1">#}
-{#                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
-{#                        {% if event.planner.pseudo == app.user.pseudo %}#}
-{#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
-{#                        {% endif %}#}
-{#                    </td>#}
-{#                </tr>#}
-{#            {% else %}#}
-{#                <tr>#}
-{#                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>#}
-{#                </tr>#}
-{#            {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#    </div>#}
-
-
     <div class="js-cards-container">
     </div>
     <div class="js-table-container">
     </div>
+
+    {#    <div class="card-container {{ vue == "cards" ? 'grid' : 'hidden' }} grid-cols-auto-fill-300 gap-4 max-w-[1200px] mx-auto">#}
+    {#        {% for event in events %}#}
+    {#            <div class="event-card#}
+    {#            max-h-[300px] flex flex-col mb-4 pt-2 pb-4 px-3 justify-between rounded-md shadow-md hover:scale-105 transition-transform#}
+    {#            {{ event.state == 'published' ? 'bg-green-200' :#}
+    {#            event.state == 'past' ? 'bg-gray-100' :#}
+    {#            event.state == 'in_progress' ? 'bg-amber-50' :#}
+    {#            event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+    {#            event.state == 'closed' ? 'bg-red-200' :#}
+    {#            event.state == 'full' ? 'bg-stone-300' :#}
+    {#            event.state == 'created' ? 'bg-blue-200' :#}
+    {#            event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+    {#                <div class="name-and-date-container flex justify-between items-center">#}
+    {#                    <p class="font-semibold text-xl hover:opacity-80">#}
+    {#                        <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.name }}</a>#}
+    {#                    </p>#}
+    {#                    <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date px-0 border-0 bg-inherit text-sm">#}
+    {#                </div>#}
+    {#                <div class="inscr-container flex justify-between items-center">#}
+    {#                    <div class="limit-container ">#}
+    {#                        <p class="font-semibold">Date limite : </p>#}
+    {#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date p-0 border-0 bg-inherit text-sm">#}
+    {#                    </div>#}
+
+    {#                    {% if (app.user.pseudo == event.planner.pseudo) %}#}
+    {#                        <p class="text-blue-500 font-semibold">Organisateur</p>#}
+    {#                    {% else %}#}
+    {#                        {% if (app.user in event.registered) %}#}
+    {#                            <p class="text-green-500 font-semibold">Inscrit</p>#}
+    {#                        {% else %}#}
+    {#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+    {#                        {% endif %}#}
+    {#                    {% endif %}#}
+
+    {#                </div>#}
+    {#                <div class="place-container">#}
+    {#                    <p>{{ event.registered | length }} / {{ event.maxNbRegistration }} places</p>#}
+    {#                </div>#}
+    {#                <div class="desc-container">#}
+    {#                    <p>{{ event.infoEvent }}</p>#}
+    {#                </div>#}
+    {#                <div class="org-container flex justify-between">#}
+
+    {#                    <p>Organisateur : <a href="{{ path('app_profil', {'id':event.planner.id}) }}" class="font-semibold hover:opacity-80">{{ event.planner.pseudo }}</a></p>#}
+    {#                    <p class="">{{ event.state | mapStatusToFrench }}</p>#}
+
+    {#                </div>#}
+    {#                <div class="actions-container mx-auto max-w-fit mt-2">#}
+    {#                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+    {#                    {% if event.planner.pseudo == app.user.pseudo %}#}
+    {#                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-2 px-4 min-w-[100px] bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+    {#                    {% endif %}#}
+    {#                </div>#}
+
+
+    {#            </div>#}
+
+    {#        {% else %}#}
+    {#            <div>#}
+    {#                <p>Aucun évènements trouvé ! Essayez différents filtres ...</p>#}
+    {#            </div>#}
+    {#        {% endfor %}#}
+
+
+    {#    </div>#}
+
+    {#    <div class="table-container max-w-[1200px] mx-auto {{ vue == "cards" ? 'hidden' : 'block' }}">#}
+    {#        <table class="table w-full">#}
+    {#            <thead>#}
+    {#            <tr class="border border-slate-900 bg-slate-900">#}
+    {#                <th class="th-style">Nom</th>#}
+    {#                <th class="th-style">Date de début</th>#}
+    {#                <th class="th-style">Durée</th>#}
+    {#                <th class="th-style">Clôture</th>#}
+    {#                <th class="th-style">Inscrits/Places</th>#}
+    {#                <th class="th-style">Inscrit</th>#}
+    {#                <th class="th-style">État</th>#}
+    {#                <th class="th-style">Actions</th>#}
+    {#            </tr>#}
+    {#            </thead>#}
+    {#            <tbody>#}
+    {#            {% for event in events %}#}
+
+    {#                <tr class="hover:opacity-80#}
+    {#                    {{ event.state == 'published' ? 'bg-green-200' :#}
+    {#                event.state == 'past' ? 'bg-gray-100' :#}
+    {#                event.state == 'in_progress' ? 'bg-amber-50' :#}
+    {#                event.state == 'archived' ? 'bg-gray-200 opacity-70' :#}
+    {#                event.state == 'closed' ? 'bg-red-200' :#}
+    {#                event.state == 'full' ? 'bg-stone-300' :#}
+    {#                event.state == 'created' ? 'bg-blue-200' :#}
+    {#                event.state == 'canceled' ? 'bg-gray-500 opacity-70' : ''}} ">#}
+
+    {#                    <td class="td-style">{{ event.name }}</td>#}
+    {#                    <td class="td-style">#}
+    {#                        <input type="datetime-local" value="{{ event.dateTimeStart | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.dateTimeStart | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+    {#                    </td>#}
+    {#                    <td class="td-style">{{ event.dateTimeStart ? event.dateTimeStart|date('d/m/Y H:i') : '' }}</td>#}
+    {#                    <td class="td-style">{{ event.duration ? event.duration|date('H:i') : '' }}</td>#}
+    {#                    <td class="td-style">#}
+    {#                        <input type="datetime-local" value="{{ event.registrationDeadline | date('Y-m-d H:i')  }}" class="js-unchangeable-date js-{{ event.registrationDeadline | date('Y-m-d_H:i')}} px-0 border-0 bg-inherit ">#}
+    {#                    </td>#}
+    {#                    <td class="td-style">{{ event.registered | length }}/{{ event.maxNbRegistration }}</td>#}
+    {#                    <td class="td-style">{% if (app.user.pseudo == event.planner.pseudo) %}#}
+    {#                            <p class="text-blue-500 font-semibold">Organisateur</p>#}
+    {#                        {% else %}#}
+    {#                            {% if (app.user in event.registered) %}#}
+    {#                                <p class="text-green-500 font-semibold">Inscrit</p>#}
+    {#                            {% else %}#}
+    {#                                <p class="text-red-500 font-semibold">Non inscrit</p>#}
+    {#                            {% endif %}#}
+    {#                        {% endif %}</td>#}
+    {#                    <td class="td-style">{{ event.state | mapStatusToFrench }}</td>#}
+    {#                    <td class="td-style flex justify-center items-center gap-1">#}
+    {#                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="py-1 px-2 max-w-fit bg-blue-800 text-white rounded-md shadow-md hover:opacity-80">VOIR</a>#}
+    {#                        {% if event.planner.pseudo == app.user.pseudo %}#}
+    {#                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="py-1 px-2 bg-amber-600 text-white rounded-md shadow-md hover:opacity-80">MODIFIER</a>#}
+    {#                        {% endif %}#}
+    {#                    </td>#}
+    {#                </tr>#}
+    {#            {% else %}#}
+    {#                <tr>#}
+    {#                    <td>Aucun évènements trouvé ! Essayez différents filtres ...</td>#}
+    {#                </tr>#}
+    {#            {% endfor %}#}
+    {#            </tbody>#}
+    {#        </table>#}
+    {#    </div>#}
 
     <a href="{{ path('app_event_new') }}" class="my-4 py-3 px-6 block w-fit mx-auto bg-amber-400 rounded-md hover:opacity-80 shadow-md font-semibold">Nouvelle sortie</a>
 
@@ -242,6 +235,4 @@
         <script src="{{ asset('JS/main_page_utils.js') }}" defer></script>
         <script src="{{ asset('JS/fetchAPI.js') }}" defer></script>
     {% endblock %}
-
-
 {% endblock %}
